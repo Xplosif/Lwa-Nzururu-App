@@ -1,22 +1,39 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Institut Lwa-Nzururu - Système de gestion scolaire
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User management
+  - name: classes
+    description: Class management
+  - name: subjects
+    description: Subject management
+  - name: students
+    description: Student management
+  - name: grades
+    description: Grade management
+  - name: stats
+    description: Statistics dashboard
+  - name: archives
+    description: Annual archives
+  - name: reports
+    description: PDF report generation
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +41,806 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/change-password:
+    post:
+      operationId: changePassword
+      tags: [auth]
+      summary: Change password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordBody"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/setup-account:
+    post:
+      operationId: setupAccount
+      tags: [auth]
+      summary: Setup account on first login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupAccountBody"
+      responses:
+        "200":
+          description: Account setup complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users (teachers and secretaries)
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create a new user (Proviseur only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+      responses:
+        "201":
+          description: User created with temporary credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateUserResponse"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user (role, class assignment)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /classes:
+    get:
+      operationId: listClasses
+      tags: [classes]
+      summary: List all classes
+      responses:
+        "200":
+          description: List of classes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Class"
+
+    post:
+      operationId: createClass
+      tags: [classes]
+      summary: Create a class
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateClassBody"
+      responses:
+        "201":
+          description: Class created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Class"
+
+  /classes/{id}:
+    get:
+      operationId: getClass
+      tags: [classes]
+      summary: Get class by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Class found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Class"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      operationId: updateClass
+      tags: [classes]
+      summary: Update class
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClassBody"
+      responses:
+        "200":
+          description: Class updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Class"
+
+    delete:
+      operationId: deleteClass
+      tags: [classes]
+      summary: Delete class
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /subjects:
+    get:
+      operationId: listSubjects
+      tags: [subjects]
+      summary: List all subjects
+      responses:
+        "200":
+          description: List of subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subject"
+
+    post:
+      operationId: createSubject
+      tags: [subjects]
+      summary: Create a subject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSubjectBody"
+      responses:
+        "201":
+          description: Subject created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subject"
+
+  /subjects/{id}:
+    patch:
+      operationId: updateSubject
+      tags: [subjects]
+      summary: Update subject
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSubjectBody"
+      responses:
+        "200":
+          description: Subject updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subject"
+
+    delete:
+      operationId: deleteSubject
+      tags: [subjects]
+      summary: Delete subject
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /students:
+    get:
+      operationId: listStudents
+      tags: [students]
+      summary: List students
+      parameters:
+        - name: classId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: academicYear
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+
+    post:
+      operationId: createStudent
+      tags: [students]
+      summary: Enroll a student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentBody"
+      responses:
+        "201":
+          description: Student enrolled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+
+  /students/{id}:
+    get:
+      operationId: getStudent
+      tags: [students]
+      summary: Get student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Student found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      operationId: updateStudent
+      tags: [students]
+      summary: Update student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStudentBody"
+      responses:
+        "200":
+          description: Student updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+
+    delete:
+      operationId: deleteStudent
+      tags: [students]
+      summary: Delete student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /grades:
+    get:
+      operationId: listGrades
+      tags: [grades]
+      summary: List grades
+      parameters:
+        - name: studentId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: classId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: subjectId
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: academicYear
+          in: query
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of grades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Grade"
+
+    post:
+      operationId: createGrade
+      tags: [grades]
+      summary: Enter a grade
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGradeBody"
+      responses:
+        "201":
+          description: Grade entered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Grade"
+
+  /grades/{id}:
+    patch:
+      operationId: updateGrade
+      tags: [grades]
+      summary: Update a grade
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGradeBody"
+      responses:
+        "200":
+          description: Grade updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Grade"
+
+    delete:
+      operationId: deleteGrade
+      tags: [grades]
+      summary: Delete grade
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /stats/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get dashboard statistics for Proviseur
+      parameters:
+        - name: academicYear
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /stats/class/{classId}:
+    get:
+      operationId: getClassStats
+      tags: [stats]
+      summary: Get statistics for a specific class
+      parameters:
+        - name: classId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: academicYear
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Class statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassStats"
+
+  /archives:
+    get:
+      operationId: listArchives
+      tags: [archives]
+      summary: List archived academic years
+      responses:
+        "200":
+          description: List of archives
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Archive"
+
+    post:
+      operationId: createArchive
+      tags: [archives]
+      summary: Archive an academic year
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateArchiveBody"
+      responses:
+        "201":
+          description: Archive created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Archive"
+
+  /archives/{id}:
+    get:
+      operationId: getArchive
+      tags: [archives]
+      summary: Get archive by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Archive found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Archive"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/bulletin/{studentId}:
+    get:
+      operationId: generateBulletin
+      tags: [reports]
+      summary: Generate student bulletin PDF
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: academicYear
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Bulletin data for PDF generation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulletinData"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/palmares/{classId}:
+    get:
+      operationId: generatePalmares
+      tags: [reports]
+      summary: Generate class palmares (rankings) PDF data
+      parameters:
+        - name: classId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: academicYear
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Palmares data for PDF generation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PalmaresData"
+
+  /reports/signature:
+    get:
+      operationId: getSignatureInfo
+      tags: [reports]
+      summary: Get proviseur signature info for PDF
+      responses:
+        "200":
+          description: Signature information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignatureInfo"
+
+    post:
+      operationId: updateSignatureInfo
+      tags: [reports]
+      summary: Update proviseur signature info
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSignatureBody"
+      responses:
+        "200":
+          description: Signature updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignatureInfo"
+
+  /course-assignments:
+    get:
+      operationId: listCourseAssignments
+      tags: [subjects]
+      summary: List course assignments (teacher-subject-class links)
+      responses:
+        "200":
+          description: List of assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseAssignment"
+
+    post:
+      operationId: createCourseAssignment
+      tags: [subjects]
+      summary: Assign a teacher to a subject-class
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseAssignmentBody"
+      responses:
+        "201":
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseAssignment"
+
+  /course-assignments/{id}:
+    delete:
+      operationId: deleteCourseAssignment
+      tags: [subjects]
+      summary: Remove a course assignment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +851,899 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    LoginBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        requiresSetup:
+          type: boolean
+      required:
+        - user
+        - requiresSetup
+
+    ChangePasswordBody:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+      required:
+        - currentPassword
+        - newPassword
+
+    SetupAccountBody:
+      type: object
+      properties:
+        tempUsername:
+          type: string
+        tempPassword:
+          type: string
+        newUsername:
+          type: string
+        newPassword:
+          type: string
+        fullName:
+          type: string
+      required:
+        - tempUsername
+        - tempPassword
+        - newUsername
+        - newPassword
+        - fullName
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [proviseur, enseignant, titulaire, secretaire]
+        classId:
+          type: ["integer", "null"]
+        className:
+          type: ["string", "null"]
+        isFirstLogin:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - username
+        - fullName
+        - role
+        - isFirstLogin
+        - createdAt
+
+    CreateUserBody:
+      type: object
+      properties:
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [enseignant, titulaire, secretaire]
+        classId:
+          type: ["integer", "null"]
+      required:
+        - fullName
+        - role
+
+    CreateUserResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        tempUsername:
+          type: string
+        tempPassword:
+          type: string
+      required:
+        - user
+        - tempUsername
+        - tempPassword
+
+    UpdateUserBody:
+      type: object
+      properties:
+        fullName:
+          type: ["string", "null"]
+        role:
+          type: ["string", "null"]
+          enum: [enseignant, titulaire, secretaire, null]
+        classId:
+          type: ["integer", "null"]
+
+    Class:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        level:
+          type: string
+        section:
+          type: ["string", "null"]
+        room:
+          type: ["string", "null"]
+        titulaire:
+          type: ["string", "null"]
+        studentCount:
+          type: integer
+        academicYear:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - level
+        - studentCount
+        - academicYear
+        - createdAt
+
+    CreateClassBody:
+      type: object
+      properties:
+        name:
+          type: string
+        level:
+          type: string
+        section:
+          type: ["string", "null"]
+        room:
+          type: ["string", "null"]
+        academicYear:
+          type: string
+      required:
+        - name
+        - level
+        - academicYear
+
+    UpdateClassBody:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        level:
+          type: ["string", "null"]
+        section:
+          type: ["string", "null"]
+        room:
+          type: ["string", "null"]
+        academicYear:
+          type: ["string", "null"]
+
+    Subject:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        coefficient:
+          type: number
+        maxPoints:
+          type: number
+        category:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - coefficient
+        - maxPoints
+        - createdAt
+
+    CreateSubjectBody:
+      type: object
+      properties:
+        name:
+          type: string
+        coefficient:
+          type: number
+        maxPoints:
+          type: number
+        category:
+          type: ["string", "null"]
+      required:
+        - name
+        - coefficient
+        - maxPoints
+
+    UpdateSubjectBody:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        coefficient:
+          type: ["number", "null"]
+        maxPoints:
+          type: ["number", "null"]
+        category:
+          type: ["string", "null"]
+
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+        registrationNumber:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+          enum: [M, F]
+        dateOfBirth:
+          type: ["string", "null"]
+        placeOfBirth:
+          type: ["string", "null"]
+        fatherName:
+          type: ["string", "null"]
+        motherName:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        classId:
+          type: integer
+        className:
+          type: string
+        academicYear:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - registrationNumber
+        - firstName
+        - lastName
+        - gender
+        - classId
+        - className
+        - academicYear
+        - createdAt
+
+    StudentDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        registrationNumber:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+          enum: [M, F]
+        dateOfBirth:
+          type: ["string", "null"]
+        placeOfBirth:
+          type: ["string", "null"]
+        fatherName:
+          type: ["string", "null"]
+        motherName:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        classId:
+          type: integer
+        className:
+          type: string
+        academicYear:
+          type: string
+        grades:
+          type: array
+          items:
+            $ref: "#/components/schemas/Grade"
+        totalPoints:
+          type: ["number", "null"]
+        percentage:
+          type: ["number", "null"]
+        rank:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - registrationNumber
+        - firstName
+        - lastName
+        - gender
+        - classId
+        - className
+        - academicYear
+        - grades
+        - createdAt
+
+    CreateStudentBody:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+          enum: [M, F]
+        dateOfBirth:
+          type: ["string", "null"]
+        placeOfBirth:
+          type: ["string", "null"]
+        fatherName:
+          type: ["string", "null"]
+        motherName:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        classId:
+          type: integer
+        academicYear:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - gender
+        - classId
+        - academicYear
+
+    UpdateStudentBody:
+      type: object
+      properties:
+        firstName:
+          type: ["string", "null"]
+        lastName:
+          type: ["string", "null"]
+        gender:
+          type: ["string", "null"]
+          enum: [M, F, null]
+        dateOfBirth:
+          type: ["string", "null"]
+        placeOfBirth:
+          type: ["string", "null"]
+        fatherName:
+          type: ["string", "null"]
+        motherName:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        classId:
+          type: ["integer", "null"]
+
+    Grade:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        subjectId:
+          type: integer
+        subjectName:
+          type: string
+        classId:
+          type: integer
+        period:
+          type: string
+          enum: [P1, P2, exam_s1, P3, P4, exam_s2, bonus]
+        points:
+          type: number
+        maxPoints:
+          type: number
+        coefficient:
+          type: number
+        academicYear:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - studentId
+        - subjectId
+        - subjectName
+        - classId
+        - period
+        - points
+        - maxPoints
+        - coefficient
+        - academicYear
+        - createdAt
+
+    CreateGradeBody:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        subjectId:
+          type: integer
+        classId:
+          type: integer
+        period:
+          type: string
+          enum: [P1, P2, exam_s1, P3, P4, exam_s2, bonus]
+        points:
+          type: number
+        academicYear:
+          type: string
+      required:
+        - studentId
+        - subjectId
+        - classId
+        - period
+        - points
+        - academicYear
+
+    UpdateGradeBody:
+      type: object
+      properties:
+        points:
+          type: ["number", "null"]
+
+    CourseAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+        teacherId:
+          type: integer
+        teacherName:
+          type: string
+        subjectId:
+          type: integer
+        subjectName:
+          type: string
+        classId:
+          type: integer
+        className:
+          type: string
+        academicYear:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - teacherId
+        - teacherName
+        - subjectId
+        - subjectName
+        - classId
+        - className
+        - academicYear
+        - createdAt
+
+    CreateCourseAssignmentBody:
+      type: object
+      properties:
+        teacherId:
+          type: integer
+        subjectId:
+          type: integer
+        classId:
+          type: integer
+        academicYear:
+          type: string
+      required:
+        - teacherId
+        - subjectId
+        - classId
+        - academicYear
+
+    DashboardStats:
+      type: object
+      properties:
+        academicYear:
+          type: string
+        totalStudents:
+          type: integer
+        maleStudents:
+          type: integer
+        femaleStudents:
+          type: integer
+        totalClasses:
+          type: integer
+        totalTeachers:
+          type: integer
+        overallPassRate:
+          type: number
+        malePassRate:
+          type: number
+        femalePassRate:
+          type: number
+        classStats:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassSummary"
+        topStudents:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopStudent"
+      required:
+        - academicYear
+        - totalStudents
+        - maleStudents
+        - femaleStudents
+        - totalClasses
+        - totalTeachers
+        - overallPassRate
+        - malePassRate
+        - femalePassRate
+        - classStats
+        - topStudents
+
+    ClassSummary:
+      type: object
+      properties:
+        classId:
+          type: integer
+        className:
+          type: string
+        totalStudents:
+          type: integer
+        maleStudents:
+          type: integer
+        femaleStudents:
+          type: integer
+        passRate:
+          type: number
+        malePassRate:
+          type: number
+        femalePassRate:
+          type: number
+        averageScore:
+          type: number
+      required:
+        - classId
+        - className
+        - totalStudents
+        - maleStudents
+        - femaleStudents
+        - passRate
+        - malePassRate
+        - femalePassRate
+        - averageScore
+
+    TopStudent:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        fullName:
+          type: string
+        className:
+          type: string
+        percentage:
+          type: number
+        rank:
+          type: integer
+      required:
+        - studentId
+        - fullName
+        - className
+        - percentage
+        - rank
+
+    ClassStats:
+      type: object
+      properties:
+        classId:
+          type: integer
+        className:
+          type: string
+        academicYear:
+          type: string
+        totalStudents:
+          type: integer
+        maleStudents:
+          type: integer
+        femaleStudents:
+          type: integer
+        passRate:
+          type: number
+        malePassRate:
+          type: number
+        femalePassRate:
+          type: number
+        averageScore:
+          type: number
+        studentRankings:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentRanking"
+        subjectAverages:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubjectAverage"
+      required:
+        - classId
+        - className
+        - academicYear
+        - totalStudents
+        - maleStudents
+        - femaleStudents
+        - passRate
+        - malePassRate
+        - femalePassRate
+        - averageScore
+        - studentRankings
+        - subjectAverages
+
+    StudentRanking:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        fullName:
+          type: string
+        gender:
+          type: string
+        percentage:
+          type: number
+        totalPoints:
+          type: number
+        rank:
+          type: integer
+        passed:
+          type: boolean
+      required:
+        - studentId
+        - fullName
+        - gender
+        - percentage
+        - totalPoints
+        - rank
+        - passed
+
+    SubjectAverage:
+      type: object
+      properties:
+        subjectId:
+          type: integer
+        subjectName:
+          type: string
+        average:
+          type: number
+        coefficient:
+          type: number
+      required:
+        - subjectId
+        - subjectName
+        - average
+        - coefficient
+
+    Archive:
+      type: object
+      properties:
+        id:
+          type: integer
+        academicYear:
+          type: string
+        archivedAt:
+          type: string
+        totalStudents:
+          type: integer
+        totalClasses:
+          type: integer
+        overallPassRate:
+          type: number
+        notes:
+          type: ["string", "null"]
+        createdBy:
+          type: string
+      required:
+        - id
+        - academicYear
+        - archivedAt
+        - totalStudents
+        - totalClasses
+        - overallPassRate
+        - createdBy
+
+    CreateArchiveBody:
+      type: object
+      properties:
+        academicYear:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - academicYear
+
+    BulletinData:
+      type: object
+      properties:
+        student:
+          $ref: "#/components/schemas/Student"
+        className:
+          type: string
+        academicYear:
+          type: string
+        gradesBySubject:
+          type: array
+          items:
+            $ref: "#/components/schemas/BulletinSubjectRow"
+        totalPoints:
+          type: number
+        maxTotalPoints:
+          type: number
+        percentage:
+          type: number
+        rank:
+          type: integer
+        totalStudentsInClass:
+          type: integer
+        passed:
+          type: boolean
+        schoolInfo:
+          $ref: "#/components/schemas/SchoolInfo"
+        signature:
+          $ref: "#/components/schemas/SignatureInfo"
+      required:
+        - student
+        - className
+        - academicYear
+        - gradesBySubject
+        - totalPoints
+        - maxTotalPoints
+        - percentage
+        - rank
+        - totalStudentsInClass
+        - passed
+        - schoolInfo
+        - signature
+
+    BulletinSubjectRow:
+      type: object
+      properties:
+        subjectId:
+          type: integer
+        subjectName:
+          type: string
+        coefficient:
+          type: number
+        P1:
+          type: ["number", "null"]
+        P2:
+          type: ["number", "null"]
+        exam_s1:
+          type: ["number", "null"]
+        P3:
+          type: ["number", "null"]
+        P4:
+          type: ["number", "null"]
+        exam_s2:
+          type: ["number", "null"]
+        bonus:
+          type: ["number", "null"]
+        totalS1:
+          type: ["number", "null"]
+        totalS2:
+          type: ["number", "null"]
+        annualTotal:
+          type: ["number", "null"]
+        maxPoints:
+          type: number
+      required:
+        - subjectId
+        - subjectName
+        - coefficient
+        - maxPoints
+
+    PalmaresData:
+      type: object
+      properties:
+        classId:
+          type: integer
+        className:
+          type: string
+        academicYear:
+          type: string
+        rankings:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentRanking"
+        schoolInfo:
+          $ref: "#/components/schemas/SchoolInfo"
+        signature:
+          $ref: "#/components/schemas/SignatureInfo"
+        stats:
+          $ref: "#/components/schemas/ClassSummary"
+      required:
+        - classId
+        - className
+        - academicYear
+        - rankings
+        - schoolInfo
+        - signature
+        - stats
+
+    SchoolInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: ["string", "null"]
+        province:
+          type: ["string", "null"]
+        territoire:
+          type: ["string", "null"]
+        code:
+          type: ["string", "null"]
+      required:
+        - name
+
+    SignatureInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        provisioneurName:
+          type: string
+        title:
+          type: string
+        location:
+          type: ["string", "null"]
+        schoolName:
+          type: string
+      required:
+        - id
+        - provisioneurName
+        - title
+        - schoolName
+
+    UpdateSignatureBody:
+      type: object
+      properties:
+        provisioneurName:
+          type: string
+        title:
+          type: string
+        location:
+          type: ["string", "null"]
+        schoolName:
+          type: string
+      required:
+        - provisioneurName
+        - title
+        - schoolName

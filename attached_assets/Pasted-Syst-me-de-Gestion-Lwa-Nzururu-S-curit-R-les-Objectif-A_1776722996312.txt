@@ -1,0 +1,41 @@
+Système de Gestion Lwa-Nzururu (Sécurité & Rôles)
+Objectif : Application Web PWA pour l'Institut Lwa-Nzururu avec gestion des accès par identifiants générés et rôles cumulables.
+
+1. Système d'Accès et Sécurité (Nouveau)
+Génération Aléatoire : Le Proviseur crée un compte enseignant. L'application génère automatiquement un Identifiant Temporaire et un Code d'accès aléatoires.
+
+Distribution : Le Proviseur remet ces accès aux enseignants.
+
+Première Connexion (Obligatoire) : Lors de la première tentative d'accès, l'application redirige l'enseignant vers une page forcée : "Personnalisez votre compte". Il doit y choisir un nouvel identifiant et un nouveau mot de passe définitifs.
+
+Gestion de profil : Possibilité de modifier le mot de passe ultérieurement dans les paramètres.
+
+2. Gestion des Rôles par le Proviseur
+Attribution des Rôles : Le Proviseur définit qui est "Enseignant Simple" et qui est "Titulaire".
+
+Attribution des Classes & Salles : Le Proviseur crée les salles et les affecte aux classes.
+
+Attribution des Cours : Le Proviseur lie une Matière, une Classe et un Enseignant (Ex: Mathématiques en 7ème A -> Mr. Kakule).
+
+Règle d'Unicité : Un cours spécifique ne peut avoir qu'un seul enseignant titulaire de la matière.
+
+3. Hiérarchie des Tableaux de Bord
+Enseignant : Voit uniquement la liste des cours qui lui sont attribués pour saisir les points (P1 à Examen S2 + Bonus).
+
+Titulaire : En plus de ses propres cours, il dispose d'un onglet "Ma Classe" pour voir les résultats de tous les élèves de sa classe dans toutes les autres matières.
+
+Secrétaire : Inscription des élèves (Formulaire Faces A & B). Dossiers consultables mais cotes invisibles.
+
+4. Spécificités Techniques (PWA & PDF)
+Mode Hors-Ligne : Utilisation de Service Workers et IndexedDB pour la saisie des notes sans forfait internet (Synchronisation dès reconnexion).
+
+Documents Officiels : Export PDF du Palmarès (format paysage avec classement auto) et du Bulletin Annuel (format portrait conforme aux modèles RDC).
+
+Stack : Django (Backend), Tailwind CSS (Frontend), PostgreSQL (Base de données).
+
+Conseils pour la mise en œuvre sur Replit Agent :
+Sur la génération aléatoire : Si l'Agent vous demande comment générer les codes, dites-lui d'utiliser la bibliothèque secrets de Python pour des identifiants sécurisés de 6 à 8 caractères.
+
+Sur le changement d'identifiant : Précisez bien à l'IA que l'identifiant initial ne doit plus fonctionner une fois que l'enseignant a choisi son propre nom d'utilisateur.
+
+Sur les bulletins : Rappelez-lui de bien calculer le Pourcentage et la Place (1er, 2ème...) automatiquement à la fin de l'examen S2.

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Institut Lwa-Nzururu"
+version = "1.0.0"
+id = "artifacts/lwa-nzururu"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22243
+
+[services.development]
+run = "pnpm --filter @workspace/lwa-nzururu run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/lwa-nzururu", "run", "build" ]
+publicDir = "artifacts/lwa-nzururu/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22243"
+BASE_PATH = "/"
