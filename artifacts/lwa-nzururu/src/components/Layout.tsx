@@ -107,7 +107,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           ) : null}
           <button
-            onClick={() => logoutMutation.mutate({ data: {} })}
+            onClick={() => logoutMutation.mutate()}
             className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-destructive hover:bg-destructive/10 transition-colors ${sidebarOpen ? "" : "justify-center"}`}
           >
             <LogOut size={16} />

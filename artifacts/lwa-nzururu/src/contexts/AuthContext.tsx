@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     query: {
       retry: false,
       throwOnError: false,
-    },
+    } as any,
   });
 
   const user: AuthUser | null =
