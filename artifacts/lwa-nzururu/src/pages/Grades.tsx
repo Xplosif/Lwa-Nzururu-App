@@ -54,15 +54,15 @@ export default function Grades() {
   });
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Notes</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Notes</h1>
           <p className="text-muted-foreground text-sm">{(grades || []).length} entree(s)</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5"><Plus size={16} /> Saisir une note</Button>
+            <Button size="sm" className="gap-1.5 w-full sm:w-auto"><Plus size={16} /> Saisir une note</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Saisir une note</DialogTitle></DialogHeader>
@@ -109,16 +109,16 @@ export default function Grades() {
         </Dialog>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <Select value={filterClassId} onValueChange={setFilterClassId}>
-          <SelectTrigger className="w-44"><SelectValue placeholder="Toutes les classes" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Toutes les classes" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toutes les classes</SelectItem>
             {(classes || []).map((c) => <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filterSubjectId} onValueChange={setFilterSubjectId}>
-          <SelectTrigger className="w-44"><SelectValue placeholder="Toutes les matieres" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Toutes les matieres" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toutes les matieres</SelectItem>
             {(subjects || []).map((s) => <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>)}
@@ -129,7 +129,7 @@ export default function Grades() {
       <Card>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            <div className="px-5 py-2 grid grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            <div className="hidden md:grid px-5 py-2 grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               <span className="col-span-3">Eleve</span>
               <span className="col-span-3">Matiere</span>
               <span className="col-span-2 text-center">Periode</span>
@@ -141,15 +141,19 @@ export default function Grades() {
               <div className="px-5 py-8 text-center text-muted-foreground text-sm">Aucune note</div>
             )}
             {(grades || []).map((g) => (
-              <div key={g.id} className="px-5 py-2.5 grid grid-cols-12 text-sm items-center hover:bg-muted/20">
-                <span className="col-span-3 text-muted-foreground text-xs">ID {g.studentId}</span>
-                <span className="col-span-3 font-medium">{g.subjectName}</span>
-                <span className="col-span-2 text-center text-muted-foreground">{PERIODS.find(p => p.value === g.period)?.label}</span>
-                <span className="col-span-2 text-center font-bold">{g.points}/{g.maxPoints}</span>
-                <div className="col-span-2 flex justify-end">
-                  <button className="p-1.5 rounded hover:bg-destructive/10 text-destructive" onClick={() => { if (confirm("Supprimer cette note?")) deleteMutation.mutate({ id: g.id }); }}>
-                    <Trash2 size={15} />
-                  </button>
+              <div key={g.id} className="px-4 sm:px-5 py-2.5 flex flex-col gap-1 md:grid md:grid-cols-12 md:gap-0 text-sm md:items-center hover:bg-muted/20">
+                <div className="flex items-center justify-between md:contents">
+                  <span className="md:col-span-3 text-muted-foreground text-xs">Eleve #{g.studentId}</span>
+                  <span className="md:col-span-3 font-medium">{g.subjectName}</span>
+                </div>
+                <div className="flex items-center justify-between md:contents">
+                  <span className="md:col-span-2 md:text-center text-muted-foreground text-xs">{PERIODS.find(p => p.value === g.period)?.label}</span>
+                  <span className="md:col-span-2 md:text-center font-bold">{g.points}/{g.maxPoints}</span>
+                  <div className="md:col-span-2 flex justify-end">
+                    <button className="p-1.5 rounded hover:bg-destructive/10 text-destructive" onClick={() => { if (confirm("Supprimer cette note?")) deleteMutation.mutate({ id: g.id }); }}>
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

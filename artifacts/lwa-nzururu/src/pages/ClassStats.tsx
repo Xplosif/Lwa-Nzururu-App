@@ -32,7 +32,7 @@ export default function ClassStats() {
   }));
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
       <div className="flex items-center gap-3">
         <Link href="/">
           <button className="p-1.5 rounded hover:bg-muted transition-colors">
@@ -40,19 +40,19 @@ export default function ClassStats() {
           </button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold">{stats.className}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">{stats.className}</h1>
           <p className="text-muted-foreground text-sm">Annee {stats.academicYear}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card><CardContent className="p-4 text-center"><p className="text-muted-foreground text-xs">Total eleves</p><p className="text-3xl font-bold">{stats.totalStudents}</p></CardContent></Card>
-        <Card><CardContent className="p-4 text-center"><p className="text-muted-foreground text-xs">Garcons</p><p className="text-3xl font-bold text-primary">{stats.maleStudents}</p></CardContent></Card>
-        <Card><CardContent className="p-4 text-center"><p className="text-muted-foreground text-xs">Filles</p><p className="text-3xl font-bold text-destructive">{stats.femaleStudents}</p></CardContent></Card>
-        <Card><CardContent className="p-4 text-center"><p className="text-muted-foreground text-xs">Taux reussite</p><p className={`text-3xl font-bold ${stats.passRate >= 50 ? "text-green-600" : "text-destructive"}`}>{stats.passRate.toFixed(0)}%</p></CardContent></Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card><CardContent className="p-3 sm:p-4 text-center"><p className="text-muted-foreground text-xs">Total eleves</p><p className="text-2xl sm:text-3xl font-bold">{stats.totalStudents}</p></CardContent></Card>
+        <Card><CardContent className="p-3 sm:p-4 text-center"><p className="text-muted-foreground text-xs">Garcons</p><p className="text-2xl sm:text-3xl font-bold text-primary">{stats.maleStudents}</p></CardContent></Card>
+        <Card><CardContent className="p-3 sm:p-4 text-center"><p className="text-muted-foreground text-xs">Filles</p><p className="text-2xl sm:text-3xl font-bold text-destructive">{stats.femaleStudents}</p></CardContent></Card>
+        <Card><CardContent className="p-3 sm:p-4 text-center"><p className="text-muted-foreground text-xs">Taux reussite</p><p className={`text-2xl sm:text-3xl font-bold ${stats.passRate >= 50 ? "text-green-600" : "text-destructive"}`}>{stats.passRate.toFixed(0)}%</p></CardContent></Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-sm">
         <Card><CardContent className="p-4"><p className="text-muted-foreground text-xs mb-1">Reussite Garcons</p><p className="text-xl font-bold">{stats.malePassRate.toFixed(1)}%</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-muted-foreground text-xs mb-1">Reussite Filles</p><p className="text-xl font-bold">{stats.femalePassRate.toFixed(1)}%</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-muted-foreground text-xs mb-1">Moyenne generale</p><p className="text-xl font-bold">{stats.averageScore.toFixed(1)}%</p></CardContent></Card>
@@ -79,7 +79,7 @@ export default function ClassStats() {
         <CardHeader><CardTitle className="text-base">Classement des eleves</CardTitle></CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            <div className="px-5 py-2 grid grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            <div className="hidden md:grid px-5 py-2 grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               <span className="col-span-1">#</span>
               <span className="col-span-5">Nom</span>
               <span className="col-span-2 text-center">Sexe</span>
@@ -87,16 +87,14 @@ export default function ClassStats() {
               <span className="col-span-2 text-right">%</span>
             </div>
             {stats.studentRankings.map((s) => (
-              <div key={s.studentId} className="px-5 py-2.5 grid grid-cols-12 text-sm items-center">
-                <span className="col-span-1 text-muted-foreground font-bold">{s.rank}</span>
-                <span className="col-span-5 font-medium truncate">{s.fullName}</span>
-                <span className="col-span-2 text-center">
-                  <Badge variant={s.gender === "M" ? "default" : "destructive"} className="text-xs px-1.5">
-                    {s.gender === "M" ? "G" : "F"}
-                  </Badge>
-                </span>
-                <span className="col-span-2 text-right text-muted-foreground">{s.totalPoints.toFixed(0)}</span>
-                <span className={`col-span-2 text-right font-bold ${s.passed ? "text-green-600" : "text-destructive"}`}>
+              <div key={s.studentId} className="px-4 sm:px-5 py-2.5 grid grid-cols-[auto_1fr_auto] md:grid-cols-12 gap-2 md:gap-0 text-sm items-center">
+                <span className="md:col-span-1 text-muted-foreground font-bold w-6 text-center">{s.rank}</span>
+                <span className="md:col-span-5 font-medium truncate">{s.fullName}</span>
+                <Badge variant={s.gender === "M" ? "default" : "destructive"} className="text-xs px-1.5 md:col-span-2 md:justify-self-center">
+                  {s.gender === "M" ? "G" : "F"}
+                </Badge>
+                <span className="hidden md:block md:col-span-2 text-right text-muted-foreground">{s.totalPoints.toFixed(0)}</span>
+                <span className={`col-start-2 md:col-start-auto md:col-span-2 text-right font-bold ${s.passed ? "text-green-600" : "text-destructive"}`}>
                   {s.percentage.toFixed(1)}%
                 </span>
               </div>

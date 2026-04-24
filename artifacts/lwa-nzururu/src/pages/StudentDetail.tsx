@@ -29,21 +29,21 @@ export default function StudentDetail() {
   }
 
   return (
-    <div className="p-6 space-y-5 max-w-4xl">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-w-4xl">
       <div className="flex items-center gap-3">
         <Link href="/students">
-          <button className="p-1.5 rounded hover:bg-muted"><ArrowLeft size={18} /></button>
+          <button className="p-1.5 rounded hover:bg-muted flex-shrink-0"><ArrowLeft size={18} /></button>
         </Link>
-        <div>
-          <h1 className="text-2xl font-bold">{student.firstName} {student.lastName}</h1>
-          <p className="text-muted-foreground text-sm">{student.registrationNumber} · {student.className}</p>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg sm:text-2xl font-bold truncate">{student.firstName} {student.lastName}</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm truncate">{student.registrationNumber} · {student.className}</p>
         </div>
-        <Badge variant={student.gender === "M" ? "default" : "destructive"} className="ml-auto">
+        <Badge variant={student.gender === "M" ? "default" : "destructive"} className="flex-shrink-0">
           {student.gender === "M" ? "Garcon" : "Fille"}
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <Card>
           <CardHeader><CardTitle className="text-sm">Informations personnelles</CardTitle></CardHeader>
           <CardContent className="text-sm space-y-1.5">

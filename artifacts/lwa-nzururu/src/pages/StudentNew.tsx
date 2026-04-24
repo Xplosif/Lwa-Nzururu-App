@@ -61,19 +61,19 @@ export default function StudentNew() {
   const set = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   return (
-    <div className="p-6 max-w-2xl">
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate("/students")} className="p-1.5 rounded hover:bg-muted">
+    <div className="p-4 sm:p-6 max-w-2xl">
+      <div className="flex items-center gap-3 mb-5 sm:mb-6">
+        <button onClick={() => navigate("/students")} className="p-1.5 rounded hover:bg-muted flex-shrink-0">
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-2xl font-bold">Inscrire un eleve</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">Inscrire un eleve</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader><CardTitle className="text-base">Informations personnelles (Fiche A)</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1">
                 <Label>Prenom *</Label>
                 <Input value={form.firstName} onChange={(e) => set("firstName", e.target.value)} required />
@@ -83,7 +83,7 @@ export default function StudentNew() {
                 <Input value={form.lastName} onChange={(e) => set("lastName", e.target.value)} required />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1">
                 <Label>Sexe *</Label>
                 <Select value={form.gender} onValueChange={(v) => set("gender", v)}>
@@ -103,7 +103,7 @@ export default function StudentNew() {
               <Label>Lieu de naissance</Label>
               <Input value={form.placeOfBirth} onChange={(e) => set("placeOfBirth", e.target.value)} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1">
                 <Label>Nom du pere</Label>
                 <Input value={form.fatherName} onChange={(e) => set("fatherName", e.target.value)} />

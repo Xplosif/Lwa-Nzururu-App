@@ -42,15 +42,15 @@ export default function Reports() {
   const handlePrint = () => window.print();
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
       <div className="no-print">
-        <h1 className="text-2xl font-bold">Generation de rapports PDF</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">Generation de rapports PDF</h1>
         <p className="text-muted-foreground text-sm">Bulletins individuels et palmares de classe</p>
       </div>
 
-      <div className="flex gap-3 no-print">
-        <Button variant={mode === "bulletin" ? "default" : "outline"} onClick={() => setMode("bulletin")}>Bulletin individuel</Button>
-        <Button variant={mode === "palmares" ? "default" : "outline"} onClick={() => setMode("palmares")}>Palmares de classe</Button>
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 no-print">
+        <Button variant={mode === "bulletin" ? "default" : "outline"} onClick={() => setMode("bulletin")} className="w-full sm:w-auto">Bulletin individuel</Button>
+        <Button variant={mode === "palmares" ? "default" : "outline"} onClick={() => setMode("palmares")} className="w-full sm:w-auto">Palmares de classe</Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

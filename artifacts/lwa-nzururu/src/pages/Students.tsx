@@ -44,22 +44,22 @@ export default function Students() {
   const canManage = user?.role === "proviseur" || user?.role === "secretaire";
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Eleves</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Eleves</h1>
           <p className="text-muted-foreground text-sm">{filtered.length} eleve(s)</p>
         </div>
         {canManage && (
           <Link href="/students/new">
-            <Button size="sm" className="gap-1.5">
+            <Button size="sm" className="gap-1.5 w-full sm:w-auto">
               <Plus size={16} /> Inscrire un eleve
             </Button>
           </Link>
         )}
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -70,7 +70,7 @@ export default function Students() {
           />
         </div>
         <Select value={classFilter} onValueChange={setClassFilter}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Toutes les classes" />
           </SelectTrigger>
           <SelectContent>
@@ -87,7 +87,7 @@ export default function Students() {
       <Card>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            <div className="px-5 py-2 grid grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            <div className="hidden md:grid px-5 py-2 grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               <span className="col-span-1">No.</span>
               <span className="col-span-4">Nom complet</span>
               <span className="col-span-2 text-center">Sexe</span>
@@ -103,16 +103,18 @@ export default function Students() {
               </div>
             )}
             {filtered.map((s) => (
-              <div key={s.id} className="px-5 py-3 grid grid-cols-12 text-sm items-center hover:bg-muted/30 transition-colors">
-                <span className="col-span-1 text-xs text-muted-foreground">{s.registrationNumber}</span>
-                <span className="col-span-4 font-medium">{s.firstName} {s.lastName}</span>
-                <span className="col-span-2 text-center">
-                  <Badge variant={s.gender === "M" ? "default" : "destructive"} className="text-xs">
+              <div key={s.id} className="px-4 sm:px-5 py-3 flex flex-col gap-2 md:grid md:grid-cols-12 md:gap-0 text-sm md:items-center hover:bg-muted/30 transition-colors">
+                <div className="flex items-center justify-between md:contents">
+                  <span className="md:col-span-1 text-xs text-muted-foreground">{s.registrationNumber}</span>
+                  <span className="md:col-span-4 font-medium">{s.firstName} {s.lastName}</span>
+                </div>
+                <div className="flex items-center justify-between md:contents">
+                  <Badge variant={s.gender === "M" ? "default" : "destructive"} className="text-xs md:col-span-2 md:justify-self-center w-fit">
                     {s.gender === "M" ? "Garcon" : "Fille"}
                   </Badge>
-                </span>
-                <span className="col-span-3 text-muted-foreground">{s.className}</span>
-                <div className="col-span-2 flex justify-end gap-1">
+                  <span className="md:col-span-3 text-muted-foreground text-xs md:text-sm">{s.className}</span>
+                </div>
+                <div className="md:col-span-2 flex justify-end gap-1 pt-1 md:pt-0 border-t md:border-t-0 border-border/60">
                   <Link href={`/students/${s.id}`}>
                     <button className="p-1.5 rounded hover:bg-primary/10 text-primary transition-colors">
                       <Eye size={15} />

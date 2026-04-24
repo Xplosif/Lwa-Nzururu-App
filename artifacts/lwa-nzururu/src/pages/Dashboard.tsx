@@ -68,13 +68,13 @@ export default function Dashboard() {
   }));
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Tableau de bord</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Tableau de bord</h1>
         <p className="text-muted-foreground text-sm">Annee academique {year}</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard title="Total Eleves" value={stats.totalStudents} icon={GraduationCap} color="bg-primary" />
         <StatCard title="Classes" value={stats.totalClasses} icon={BookOpen} color="bg-blue-600" />
         <StatCard title="Personnel" value={stats.totalTeachers} icon={Users} color="bg-amber-600" />

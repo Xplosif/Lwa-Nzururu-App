@@ -69,15 +69,15 @@ export default function Teachers() {
   const staff = (users || []).filter((u) => u.role !== "proviseur");
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Personnel</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Personnel</h1>
           <p className="text-muted-foreground text-sm">{staff.length} membres du personnel</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5">
+            <Button size="sm" className="gap-1.5 w-full sm:w-auto">
               <Plus size={16} /> Ajouter un membre
             </Button>
           </DialogTrigger>
@@ -143,7 +143,7 @@ export default function Teachers() {
       <Card>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            <div className="px-5 py-2 grid grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            <div className="hidden md:grid px-5 py-2 grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               <span className="col-span-4">Nom</span>
               <span className="col-span-2">Role</span>
               <span className="col-span-3">Classe assignee</span>
@@ -155,20 +155,22 @@ export default function Teachers() {
               <div className="px-5 py-8 text-center text-muted-foreground text-sm">Aucun membre du personnel</div>
             )}
             {staff.map((u) => (
-              <div key={u.id} className="px-5 py-3 grid grid-cols-12 text-sm items-center hover:bg-muted/20">
-                <span className="col-span-4 font-medium">{u.fullName}</span>
-                <span className="col-span-2">
-                  <Badge variant={ROLE_COLORS[u.role] || "outline"} className="text-xs">{ROLE_LABELS[u.role] || u.role}</Badge>
-                </span>
-                <span className="col-span-3 text-muted-foreground">{u.className || "-"}</span>
-                <span className="col-span-2 text-center">
-                  {u.isFirstLogin ? (
-                    <Badge variant="secondary" className="text-xs">En attente</Badge>
-                  ) : (
-                    <Badge className="text-xs bg-green-100 text-green-700 hover:bg-green-100">Actif</Badge>
-                  )}
-                </span>
-                <div className="col-span-1 flex justify-end">
+              <div key={u.id} className="px-4 sm:px-5 py-3 flex flex-col gap-2 md:grid md:grid-cols-12 md:gap-0 text-sm md:items-center hover:bg-muted/20">
+                <div className="flex items-center justify-between md:contents">
+                  <span className="md:col-span-4 font-medium">{u.fullName}</span>
+                  <Badge variant={ROLE_COLORS[u.role] || "outline"} className="text-xs md:col-span-2 w-fit">{ROLE_LABELS[u.role] || u.role}</Badge>
+                </div>
+                <div className="flex items-center justify-between md:contents">
+                  <span className="md:col-span-3 text-muted-foreground text-xs md:text-sm">{u.className || "Aucune classe"}</span>
+                  <div className="md:col-span-2 md:text-center">
+                    {u.isFirstLogin ? (
+                      <Badge variant="secondary" className="text-xs">En attente</Badge>
+                    ) : (
+                      <Badge className="text-xs bg-green-100 text-green-700 hover:bg-green-100">Actif</Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="md:col-span-1 flex justify-end pt-1 md:pt-0 border-t md:border-t-0 border-border/60">
                   <button
                     className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
                     onClick={() => { if (confirm("Supprimer ce compte?")) deleteMutation.mutate({ id: u.id }); }}

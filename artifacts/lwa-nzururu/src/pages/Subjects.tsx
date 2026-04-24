@@ -29,15 +29,15 @@ export default function Subjects() {
   });
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Matieres</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Matieres</h1>
           <p className="text-muted-foreground text-sm">{(subjects || []).length} matieres</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5"><Plus size={16} /> Ajouter une matiere</Button>
+            <Button size="sm" className="gap-1.5 w-full sm:w-auto"><Plus size={16} /> Ajouter une matiere</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Nouvelle matiere</DialogTitle></DialogHeader>
@@ -59,7 +59,7 @@ export default function Subjects() {
       <Card>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            <div className="px-5 py-2 grid grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            <div className="hidden md:grid px-5 py-2 grid-cols-12 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               <span className="col-span-4">Matiere</span>
               <span className="col-span-2 text-center">Coeff.</span>
               <span className="col-span-2 text-center">Max pts</span>
@@ -68,12 +68,16 @@ export default function Subjects() {
             </div>
             {isLoading && <div className="px-5 py-8 text-center text-muted-foreground text-sm">Chargement...</div>}
             {(subjects || []).map((s) => (
-              <div key={s.id} className="px-5 py-3 grid grid-cols-12 text-sm items-center hover:bg-muted/20">
-                <span className="col-span-4 font-medium">{s.name}</span>
-                <span className="col-span-2 text-center text-muted-foreground">{s.coefficient}</span>
-                <span className="col-span-2 text-center text-muted-foreground">{s.maxPoints}</span>
-                <span className="col-span-3 text-muted-foreground">{s.category || "-"}</span>
-                <div className="col-span-1 flex justify-end">
+              <div key={s.id} className="px-4 sm:px-5 py-3 flex flex-col gap-2 md:grid md:grid-cols-12 md:gap-0 text-sm md:items-center hover:bg-muted/20">
+                <div className="flex items-center justify-between md:contents">
+                  <span className="md:col-span-4 font-medium">{s.name}</span>
+                  <span className="md:col-span-2 md:text-center text-xs md:text-sm"><span className="md:hidden text-muted-foreground">Coef. </span>{s.coefficient}</span>
+                </div>
+                <div className="flex items-center justify-between md:contents">
+                  <span className="md:col-span-2 md:text-center text-muted-foreground text-xs md:text-sm"><span className="md:hidden">Max </span>{s.maxPoints}pts</span>
+                  <span className="md:col-span-3 text-muted-foreground text-xs md:text-sm">{s.category || "Generale"}</span>
+                </div>
+                <div className="md:col-span-1 flex justify-end pt-1 md:pt-0 border-t md:border-t-0 border-border/60">
                   <button className="p-1.5 rounded hover:bg-destructive/10 text-destructive" onClick={() => { if (confirm("Supprimer cette matiere?")) deleteMutation.mutate({ id: s.id }); }}>
                     <Trash2 size={15} />
                   </button>

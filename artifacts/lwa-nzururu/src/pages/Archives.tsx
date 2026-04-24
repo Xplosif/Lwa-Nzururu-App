@@ -26,15 +26,15 @@ export default function Archives() {
   });
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Archives annuelles</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Archives annuelles</h1>
           <p className="text-muted-foreground text-sm">{(archives || []).length} annee(s) archivee(s)</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5"><Plus size={16} /> Archiver une annee</Button>
+            <Button size="sm" className="gap-1.5 w-full sm:w-auto"><Plus size={16} /> Archiver une annee</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Archiver une annee academique</DialogTitle></DialogHeader>
