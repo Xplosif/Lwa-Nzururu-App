@@ -9,6 +9,7 @@ import gradesRouter from "./grades";
 import statsRouter from "./stats";
 import archivesRouter from "./archives";
 import reportsRouter from "./reports";
+import deliberationsRouter from "./deliberations";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(gradesRouter);
 router.use(statsRouter);
 router.use(archivesRouter);
 router.use(reportsRouter);
+router.use(deliberationsRouter);
 
 export default router;

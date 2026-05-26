@@ -589,6 +589,77 @@ export interface UpdateSignatureBody {
   schoolName: string;
 }
 
+export interface Deliberation {
+  id: number;
+  classId: number;
+  className: string;
+  academicYear: string;
+  semester: string;
+  status: string;
+  /** @nullable */
+  approvedAt?: string | null;
+  /** @nullable */
+  approvedBy?: number | null;
+  createdAt: string;
+}
+
+export interface CreateDeliberationBody {
+  classId: number;
+  academicYear: string;
+  semester: string;
+}
+
+export interface DeliberationBonusEntry {
+  id: number;
+  deliberationId: number;
+  studentId: number;
+  bonusPoints: number;
+}
+
+export interface SetDeliberationBonusBody {
+  studentId: number;
+  bonusPoints: number;
+}
+
+export interface DeliberationStudentEntry {
+  studentId: number;
+  registrationNumber: string;
+  fullName: string;
+  gender: string;
+  bonusPoints: number;
+  /** @nullable */
+  semesterTotal?: number | null;
+  /** @nullable */
+  semesterMax?: number | null;
+  /** @nullable */
+  percentage?: number | null;
+  passed: boolean;
+}
+
+export interface DeliberationDetail {
+  deliberation: Deliberation;
+  students: DeliberationStudentEntry[];
+}
+
+export interface ParentBulletinResult {
+  studentId: number;
+  registrationNumber: string;
+  fullName: string;
+  className: string;
+  academicYear: string;
+  semester: string;
+  deliberationStatus: string;
+  gradesBySubject: BulletinSubjectRow[];
+  totalPoints: number;
+  maxTotalPoints: number;
+  percentage: number;
+  /** @nullable */
+  rank?: number | null;
+  totalStudentsInClass: number;
+  passed: boolean;
+  bonusPoints: number;
+}
+
 export type ListStudentsParams = {
   /**
    * @nullable
@@ -633,4 +704,14 @@ export type GenerateBulletinParams = {
 
 export type GeneratePalmaresParams = {
   academicYear: string;
+};
+
+export type ListDeliberationsParams = {
+  classId?: number | null;
+  academicYear?: string | null;
+};
+
+export type GetParentBulletinParams = {
+  academicYear: string;
+  semester: string;
 };

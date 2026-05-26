@@ -20,6 +20,8 @@ import Archives from "@/pages/Archives";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import Proclamation from "@/pages/Proclamation";
+import Deliberation from "@/pages/Deliberation";
+import ParentBulletin from "@/pages/ParentBulletin";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30000 } },
@@ -88,6 +90,12 @@ function AppRoutes() {
         <Route path="/grades" component={Grades} />
         <Route path="/proclamation">
           <ProtectedRoute component={Proclamation} roles={["titulaire"]} />
+        </Route>
+        <Route path="/deliberation">
+          <ProtectedRoute component={Deliberation} roles={["proviseur"]} />
+        </Route>
+        <Route path="/bulletin">
+          <ProtectedRoute component={ParentBulletin} roles={["parent"]} />
         </Route>
         <Route path="/archives">
           <ProtectedRoute component={Archives} roles={["proviseur"]} />

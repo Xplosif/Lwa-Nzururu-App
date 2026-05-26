@@ -26,24 +26,32 @@ import type {
   CreateArchiveBody,
   CreateClassBody,
   CreateCourseAssignmentBody,
+  CreateDeliberationBody,
   CreateGradeBody,
   CreateStudentBody,
   CreateSubjectBody,
   CreateUserBody,
   CreateUserResponse,
   DashboardStats,
+  Deliberation,
+  DeliberationBonusEntry,
+  DeliberationDetail,
   ErrorResponse,
   GenerateBulletinParams,
   GeneratePalmaresParams,
   GetClassStatsParams,
   GetDashboardStatsParams,
+  GetParentBulletinParams,
   Grade,
   HealthStatus,
+  ListDeliberationsParams,
   ListGradesParams,
   ListStudentsParams,
   LoginBody,
   LoginResponse,
   PalmaresData,
+  ParentBulletinResult,
+  SetDeliberationBonusBody,
   SetupAccountBody,
   SignatureInfo,
   Student,
@@ -3575,3 +3583,542 @@ export const useDeleteCourseAssignment = <
 > => {
   return useMutation(getDeleteCourseAssignmentMutationOptions(options));
 };
+
+/**
+ * @summary List deliberations
+ */
+export const getListDeliberationsUrl = (params?: ListDeliberationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/deliberations?${stringifiedParams}`
+    : `/api/deliberations`;
+};
+
+export const listDeliberations = async (
+  params?: ListDeliberationsParams,
+  options?: RequestInit,
+): Promise<Deliberation[]> => {
+  return customFetch<Deliberation[]>(getListDeliberationsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListDeliberationsQueryKey = (
+  params?: ListDeliberationsParams,
+) => {
+  return [`/api/deliberations`, ...(params ? [params] : [])] as const;
+};
+
+export const getListDeliberationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listDeliberations>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListDeliberationsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listDeliberations>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListDeliberationsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listDeliberations>>
+  > = ({ signal }) => listDeliberations(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listDeliberations>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListDeliberationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listDeliberations>>
+>;
+export type ListDeliberationsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List deliberations
+ */
+
+export function useListDeliberations<
+  TData = Awaited<ReturnType<typeof listDeliberations>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListDeliberationsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listDeliberations>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListDeliberationsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a deliberation for a class+semester
+ */
+export const getCreateDeliberationUrl = () => {
+  return `/api/deliberations`;
+};
+
+export const createDeliberation = async (
+  createDeliberationBody: CreateDeliberationBody,
+  options?: RequestInit,
+): Promise<Deliberation> => {
+  return customFetch<Deliberation>(getCreateDeliberationUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createDeliberationBody),
+  });
+};
+
+export const getCreateDeliberationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createDeliberation>>,
+    TError,
+    { data: BodyType<CreateDeliberationBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createDeliberation>>,
+  TError,
+  { data: BodyType<CreateDeliberationBody> },
+  TContext
+> => {
+  const mutationKey = ["createDeliberation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createDeliberation>>,
+    { data: BodyType<CreateDeliberationBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createDeliberation(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateDeliberationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createDeliberation>>
+>;
+export type CreateDeliberationMutationBody = BodyType<CreateDeliberationBody>;
+export type CreateDeliberationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a deliberation for a class+semester
+ */
+export const useCreateDeliberation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createDeliberation>>,
+    TError,
+    { data: BodyType<CreateDeliberationBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createDeliberation>>,
+  TError,
+  { data: BodyType<CreateDeliberationBody> },
+  TContext
+> => {
+  return useMutation(getCreateDeliberationMutationOptions(options));
+};
+
+/**
+ * @summary Get a deliberation with students and bonuses
+ */
+export const getGetDeliberationUrl = (id: number) => {
+  return `/api/deliberations/${id}`;
+};
+
+export const getDeliberation = async (
+  id: number,
+  options?: RequestInit,
+): Promise<DeliberationDetail> => {
+  return customFetch<DeliberationDetail>(getGetDeliberationUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetDeliberationQueryKey = (id: number) => {
+  return [`/api/deliberations/${id}`] as const;
+};
+
+export const getGetDeliberationQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDeliberation>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getDeliberation>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetDeliberationQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeliberation>>> = ({
+    signal,
+  }) => getDeliberation(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDeliberation>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetDeliberationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDeliberation>>
+>;
+export type GetDeliberationQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get a deliberation with students and bonuses
+ */
+
+export function useGetDeliberation<
+  TData = Awaited<ReturnType<typeof getDeliberation>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getDeliberation>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetDeliberationQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Approve a deliberation (Proviseur)
+ */
+export const getApproveDeliberationUrl = (id: number) => {
+  return `/api/deliberations/${id}/approve`;
+};
+
+export const approveDeliberation = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Deliberation> => {
+  return customFetch<Deliberation>(getApproveDeliberationUrl(id), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getApproveDeliberationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof approveDeliberation>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof approveDeliberation>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["approveDeliberation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof approveDeliberation>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return approveDeliberation(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ApproveDeliberationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof approveDeliberation>>
+>;
+
+export type ApproveDeliberationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Approve a deliberation (Proviseur)
+ */
+export const useApproveDeliberation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof approveDeliberation>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof approveDeliberation>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getApproveDeliberationMutationOptions(options));
+};
+
+/**
+ * @summary Set bonus points for a student in a deliberation
+ */
+export const getSetDeliberationBonusUrl = (id: number) => {
+  return `/api/deliberations/${id}/bonus`;
+};
+
+export const setDeliberationBonus = async (
+  id: number,
+  setDeliberationBonusBody: SetDeliberationBonusBody,
+  options?: RequestInit,
+): Promise<DeliberationBonusEntry> => {
+  return customFetch<DeliberationBonusEntry>(getSetDeliberationBonusUrl(id), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(setDeliberationBonusBody),
+  });
+};
+
+export const getSetDeliberationBonusMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setDeliberationBonus>>,
+    TError,
+    { id: number; data: BodyType<SetDeliberationBonusBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setDeliberationBonus>>,
+  TError,
+  { id: number; data: BodyType<SetDeliberationBonusBody> },
+  TContext
+> => {
+  const mutationKey = ["setDeliberationBonus"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setDeliberationBonus>>,
+    { id: number; data: BodyType<SetDeliberationBonusBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return setDeliberationBonus(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetDeliberationBonusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setDeliberationBonus>>
+>;
+export type SetDeliberationBonusMutationBody =
+  BodyType<SetDeliberationBonusBody>;
+export type SetDeliberationBonusMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Set bonus points for a student in a deliberation
+ */
+export const useSetDeliberationBonus = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setDeliberationBonus>>,
+    TError,
+    { id: number; data: BodyType<SetDeliberationBonusBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof setDeliberationBonus>>,
+  TError,
+  { id: number; data: BodyType<SetDeliberationBonusBody> },
+  TContext
+> => {
+  return useMutation(getSetDeliberationBonusMutationOptions(options));
+};
+
+/**
+ * @summary Get the authenticated parent's child bulletin (only if deliberation approved)
+ */
+export const getGetParentBulletinUrl = (params: GetParentBulletinParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/parent/bulletin?${stringifiedParams}`
+    : `/api/parent/bulletin`;
+};
+
+export const getParentBulletin = async (
+  params: GetParentBulletinParams,
+  options?: RequestInit,
+): Promise<ParentBulletinResult> => {
+  return customFetch<ParentBulletinResult>(getGetParentBulletinUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetParentBulletinQueryKey = (
+  params?: GetParentBulletinParams,
+) => {
+  return [`/api/parent/bulletin`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetParentBulletinQueryOptions = <
+  TData = Awaited<ReturnType<typeof getParentBulletin>>,
+  TError = ErrorType<void>,
+>(
+  params: GetParentBulletinParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getParentBulletin>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetParentBulletinQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getParentBulletin>>
+  > = ({ signal }) => getParentBulletin(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getParentBulletin>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetParentBulletinQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getParentBulletin>>
+>;
+export type GetParentBulletinQueryError = ErrorType<void>;
+
+/**
+ * @summary Get the authenticated parent's child bulletin (only if deliberation approved)
+ */
+
+export function useGetParentBulletin<
+  TData = Awaited<ReturnType<typeof getParentBulletin>>,
+  TError = ErrorType<void>,
+>(
+  params: GetParentBulletinParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getParentBulletin>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetParentBulletinQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}

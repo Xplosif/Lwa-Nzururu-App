@@ -6,3 +6,4 @@ export * from "./grades";
 export * from "./course_assignments";
 export * from "./archives";
 export * from "./settings";
+export * from "./deliberations";

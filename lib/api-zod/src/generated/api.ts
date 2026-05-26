@@ -854,3 +854,150 @@ export const CreateCourseAssignmentBody = zod.object({
 export const DeleteCourseAssignmentParams = zod.object({
   id: zod.coerce.number(),
 });
+
+/**
+ * @summary List deliberations
+ */
+export const ListDeliberationsQueryParams = zod.object({
+  classId: zod.coerce.number().nullish(),
+  academicYear: zod.coerce.string().nullish(),
+});
+
+export const ListDeliberationsResponseItem = zod.object({
+  id: zod.number(),
+  classId: zod.number(),
+  className: zod.string(),
+  academicYear: zod.string(),
+  semester: zod.string(),
+  status: zod.string(),
+  approvedAt: zod.string().nullish(),
+  approvedBy: zod.number().nullish(),
+  createdAt: zod.string(),
+});
+export const ListDeliberationsResponse = zod.array(
+  ListDeliberationsResponseItem,
+);
+
+/**
+ * @summary Create a deliberation for a class+semester
+ */
+export const CreateDeliberationBody = zod.object({
+  classId: zod.number(),
+  academicYear: zod.string(),
+  semester: zod.string(),
+});
+
+/**
+ * @summary Get a deliberation with students and bonuses
+ */
+export const GetDeliberationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetDeliberationResponse = zod.object({
+  deliberation: zod.object({
+    id: zod.number(),
+    classId: zod.number(),
+    className: zod.string(),
+    academicYear: zod.string(),
+    semester: zod.string(),
+    status: zod.string(),
+    approvedAt: zod.string().nullish(),
+    approvedBy: zod.number().nullish(),
+    createdAt: zod.string(),
+  }),
+  students: zod.array(
+    zod.object({
+      studentId: zod.number(),
+      registrationNumber: zod.string(),
+      fullName: zod.string(),
+      gender: zod.string(),
+      bonusPoints: zod.number(),
+      semesterTotal: zod.number().nullish(),
+      semesterMax: zod.number().nullish(),
+      percentage: zod.number().nullish(),
+      passed: zod.boolean(),
+    }),
+  ),
+});
+
+/**
+ * @summary Approve a deliberation (Proviseur)
+ */
+export const ApproveDeliberationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const ApproveDeliberationResponse = zod.object({
+  id: zod.number(),
+  classId: zod.number(),
+  className: zod.string(),
+  academicYear: zod.string(),
+  semester: zod.string(),
+  status: zod.string(),
+  approvedAt: zod.string().nullish(),
+  approvedBy: zod.number().nullish(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Set bonus points for a student in a deliberation
+ */
+export const SetDeliberationBonusParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const SetDeliberationBonusBody = zod.object({
+  studentId: zod.number(),
+  bonusPoints: zod.number(),
+});
+
+export const SetDeliberationBonusResponse = zod.object({
+  id: zod.number(),
+  deliberationId: zod.number(),
+  studentId: zod.number(),
+  bonusPoints: zod.number(),
+});
+
+/**
+ * @summary Get the authenticated parent's child bulletin (only if deliberation approved)
+ */
+export const GetParentBulletinQueryParams = zod.object({
+  academicYear: zod.coerce.string(),
+  semester: zod.coerce.string(),
+});
+
+export const GetParentBulletinResponse = zod.object({
+  studentId: zod.number(),
+  registrationNumber: zod.string(),
+  fullName: zod.string(),
+  className: zod.string(),
+  academicYear: zod.string(),
+  semester: zod.string(),
+  deliberationStatus: zod.string(),
+  gradesBySubject: zod.array(
+    zod.object({
+      subjectId: zod.number(),
+      subjectName: zod.string(),
+      coefficient: zod.number(),
+      P1: zod.number().nullish(),
+      P2: zod.number().nullish(),
+      exam_s1: zod.number().nullish(),
+      P3: zod.number().nullish(),
+      P4: zod.number().nullish(),
+      exam_s2: zod.number().nullish(),
+      bonus: zod.number().nullish(),
+      totalS1: zod.number().nullish(),
+      totalS2: zod.number().nullish(),
+      annualTotal: zod.number().nullish(),
+      maxPoints: zod.number(),
+    }),
+  ),
+  totalPoints: zod.number(),
+  maxTotalPoints: zod.number(),
+  percentage: zod.number(),
+  rank: zod.number().nullish(),
+  totalStudentsInClass: zod.number(),
+  passed: zod.boolean(),
+  bonusPoints: zod.number(),
+});

@@ -26,6 +26,8 @@ const navItems = [
   { href: "/subjects", label: "Matieres", icon: BookOpen, roles: ["proviseur"] },
   { href: "/grades", label: "Notes", icon: ClipboardList, roles: ["proviseur", "enseignant", "titulaire"] },
   { href: "/proclamation", label: "Proclamation", icon: FileText, roles: ["titulaire"] },
+  { href: "/deliberation", label: "Deliberation", icon: ClipboardList, roles: ["proviseur"] },
+  { href: "/bulletin", label: "Bulletin de mon enfant", icon: GraduationCap, roles: ["parent"] },
   { href: "/archives", label: "Archives", icon: Archive, roles: ["proviseur"] },
   { href: "/reports", label: "Rapports PDF", icon: FileText, roles: ["proviseur", "titulaire"] },
   { href: "/settings", label: "Parametres", icon: Settings, roles: ["proviseur"] },

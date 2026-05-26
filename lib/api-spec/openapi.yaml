@@ -841,6 +841,141 @@ paths:
         "204":
           description: Deleted
 
+  /deliberations:
+    get:
+      operationId: listDeliberations
+      tags: [deliberations]
+      summary: List deliberations
+      parameters:
+        - name: classId
+          in: query
+          schema:
+            type: integer
+            nullable: true
+        - name: academicYear
+          in: query
+          schema:
+            type: string
+            nullable: true
+      responses:
+        "200":
+          description: List of deliberations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deliberation"
+
+    post:
+      operationId: createDeliberation
+      tags: [deliberations]
+      summary: Create a deliberation for a class+semester
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeliberationBody"
+      responses:
+        "201":
+          description: Deliberation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deliberation"
+
+  /deliberations/{id}:
+    get:
+      operationId: getDeliberation
+      tags: [deliberations]
+      summary: Get a deliberation with students and bonuses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deliberation detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliberationDetail"
+
+  /deliberations/{id}/approve:
+    post:
+      operationId: approveDeliberation
+      tags: [deliberations]
+      summary: Approve a deliberation (Proviseur)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deliberation approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deliberation"
+
+  /deliberations/{id}/bonus:
+    post:
+      operationId: setDeliberationBonus
+      tags: [deliberations]
+      summary: Set bonus points for a student in a deliberation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetDeliberationBonusBody"
+      responses:
+        "200":
+          description: Bonus updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliberationBonusEntry"
+
+  /parent/bulletin:
+    get:
+      operationId: getParentBulletin
+      tags: [deliberations]
+      summary: Get the authenticated parent's child bulletin (only if deliberation approved)
+      parameters:
+        - name: academicYear
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: semester
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Child bulletin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParentBulletinResult"
+        "403":
+          description: Results not yet approved
+        "404":
+          description: No child linked to this account
+
 components:
   schemas:
     HealthStatus:
@@ -1824,3 +1959,168 @@ components:
         - provisioneurName
         - title
         - schoolName
+
+    Deliberation:
+      type: object
+      properties:
+        id:
+          type: integer
+        classId:
+          type: integer
+        className:
+          type: string
+        academicYear:
+          type: string
+        semester:
+          type: string
+        status:
+          type: string
+        approvedAt:
+          type: ["string", "null"]
+        approvedBy:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - classId
+        - className
+        - academicYear
+        - semester
+        - status
+        - createdAt
+
+    CreateDeliberationBody:
+      type: object
+      properties:
+        classId:
+          type: integer
+        academicYear:
+          type: string
+        semester:
+          type: string
+      required:
+        - classId
+        - academicYear
+        - semester
+
+    DeliberationBonusEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        deliberationId:
+          type: integer
+        studentId:
+          type: integer
+        bonusPoints:
+          type: number
+      required:
+        - id
+        - deliberationId
+        - studentId
+        - bonusPoints
+
+    SetDeliberationBonusBody:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        bonusPoints:
+          type: number
+      required:
+        - studentId
+        - bonusPoints
+
+    DeliberationStudentEntry:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        registrationNumber:
+          type: string
+        fullName:
+          type: string
+        gender:
+          type: string
+        bonusPoints:
+          type: number
+        semesterTotal:
+          type: ["number", "null"]
+        semesterMax:
+          type: ["number", "null"]
+        percentage:
+          type: ["number", "null"]
+        passed:
+          type: boolean
+      required:
+        - studentId
+        - registrationNumber
+        - fullName
+        - gender
+        - bonusPoints
+        - passed
+
+    DeliberationDetail:
+      type: object
+      properties:
+        deliberation:
+          $ref: "#/components/schemas/Deliberation"
+        students:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliberationStudentEntry"
+      required:
+        - deliberation
+        - students
+
+    ParentBulletinResult:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        registrationNumber:
+          type: string
+        fullName:
+          type: string
+        className:
+          type: string
+        academicYear:
+          type: string
+        semester:
+          type: string
+        deliberationStatus:
+          type: string
+        gradesBySubject:
+          type: array
+          items:
+            $ref: "#/components/schemas/BulletinSubjectRow"
+        totalPoints:
+          type: number
+        maxTotalPoints:
+          type: number
+        percentage:
+          type: number
+        rank:
+          type: ["integer", "null"]
+        totalStudentsInClass:
+          type: integer
+        passed:
+          type: boolean
+        bonusPoints:
+          type: number
+      required:
+        - studentId
+        - registrationNumber
+        - fullName
+        - className
+        - academicYear
+        - semester
+        - deliberationStatus
+        - gradesBySubject
+        - totalPoints
+        - maxTotalPoints
+        - percentage
+        - totalStudentsInClass
+        - passed
+        - bonusPoints
