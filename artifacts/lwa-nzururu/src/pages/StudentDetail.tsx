@@ -35,7 +35,7 @@ export default function StudentDetail() {
           <button className="p-1.5 rounded hover:bg-muted flex-shrink-0"><ArrowLeft size={18} /></button>
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="text-lg sm:text-2xl font-bold truncate">{student.firstName} {student.lastName}</h1>
+          <h1 className="text-lg sm:text-2xl font-bold truncate">{student.lastName} {student.postnom ? student.postnom + " " : ""}{student.firstName}</h1>
           <p className="text-muted-foreground text-xs sm:text-sm truncate">{student.registrationNumber} · {student.className}</p>
         </div>
         <Badge variant={student.gender === "M" ? "default" : "destructive"} className="flex-shrink-0">
@@ -47,11 +47,20 @@ export default function StudentDetail() {
         <Card>
           <CardHeader><CardTitle className="text-sm">Informations personnelles</CardTitle></CardHeader>
           <CardContent className="text-sm space-y-1.5">
-            {student.dateOfBirth && <div><span className="text-muted-foreground">Naissance: </span>{student.dateOfBirth}</div>}
-            {student.placeOfBirth && <div><span className="text-muted-foreground">Lieu: </span>{student.placeOfBirth}</div>}
+            {student.dateOfBirth && <div><span className="text-muted-foreground">Date de naissance: </span>{student.dateOfBirth}</div>}
+            {student.placeOfBirth && <div><span className="text-muted-foreground">Lieu de naissance: </span>{student.placeOfBirth}</div>}
             {student.fatherName && <div><span className="text-muted-foreground">Pere: </span>{student.fatherName}</div>}
             {student.motherName && <div><span className="text-muted-foreground">Mere: </span>{student.motherName}</div>}
+            {student.fonction && <div><span className="text-muted-foreground">Fonction: </span>{student.fonction}</div>}
             {student.address && <div><span className="text-muted-foreground">Adresse: </span>{student.address}</div>}
+            {student.confession && <div><span className="text-muted-foreground">Confession: </span>{student.confession}</div>}
+            {student.ecoleProvenance && <div><span className="text-muted-foreground">Ecole de provenance: </span>{student.ecoleProvenance}</div>}
+            {student.bulletinsPresentes && student.bulletinsPresentes.length > 0 && (
+              <div><span className="text-muted-foreground">Bulletins presentes: </span>{student.bulletinsPresentes.join(", ")}</div>
+            )}
+            {student.pourcentagePrecedent != null && (
+              <div><span className="text-muted-foreground">Pourcentage precedent: </span>{student.pourcentagePrecedent}%</div>
+            )}
           </CardContent>
         </Card>
         <Card>

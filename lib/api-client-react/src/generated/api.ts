@@ -47,6 +47,7 @@ import type {
   SetupAccountBody,
   SignatureInfo,
   Student,
+  StudentCreated,
   StudentDetail,
   Subject,
   SuccessResponse,
@@ -1795,8 +1796,8 @@ export const getCreateStudentUrl = () => {
 export const createStudent = async (
   createStudentBody: CreateStudentBody,
   options?: RequestInit,
-): Promise<Student> => {
-  return customFetch<Student>(getCreateStudentUrl(), {
+): Promise<StudentCreated> => {
+  return customFetch<StudentCreated>(getCreateStudentUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },

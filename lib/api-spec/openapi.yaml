@@ -453,7 +453,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Student"
+                $ref: "#/components/schemas/StudentCreated"
 
   /students/{id}:
     get:
@@ -1107,9 +1107,11 @@ components:
           type: integer
         registrationNumber:
           type: string
-        firstName:
-          type: string
         lastName:
+          type: string
+        postnom:
+          type: ["string", "null"]
+        firstName:
           type: string
         gender:
           type: string
@@ -1122,8 +1124,21 @@ components:
           type: ["string", "null"]
         motherName:
           type: ["string", "null"]
+        fonction:
+          type: ["string", "null"]
         address:
           type: ["string", "null"]
+        confession:
+          type: ["string", "null"]
+        ecoleProvenance:
+          type: ["string", "null"]
+        bulletinsPresentes:
+          type: array
+          items:
+            type: string
+          nullable: true
+        pourcentagePrecedent:
+          type: ["number", "null"]
         classId:
           type: integer
         className:
@@ -1135,13 +1150,30 @@ components:
       required:
         - id
         - registrationNumber
-        - firstName
         - lastName
+        - firstName
         - gender
         - classId
         - className
         - academicYear
         - createdAt
+
+    StudentCreated:
+      allOf:
+        - $ref: "#/components/schemas/Student"
+        - type: object
+          properties:
+            parentCredentials:
+              type: object
+              nullable: true
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
 
     StudentDetail:
       type: object
@@ -1150,9 +1182,11 @@ components:
           type: integer
         registrationNumber:
           type: string
-        firstName:
-          type: string
         lastName:
+          type: string
+        postnom:
+          type: ["string", "null"]
+        firstName:
           type: string
         gender:
           type: string
@@ -1165,8 +1199,21 @@ components:
           type: ["string", "null"]
         motherName:
           type: ["string", "null"]
+        fonction:
+          type: ["string", "null"]
         address:
           type: ["string", "null"]
+        confession:
+          type: ["string", "null"]
+        ecoleProvenance:
+          type: ["string", "null"]
+        bulletinsPresentes:
+          type: array
+          items:
+            type: string
+          nullable: true
+        pourcentagePrecedent:
+          type: ["number", "null"]
         classId:
           type: integer
         className:
@@ -1188,8 +1235,8 @@ components:
       required:
         - id
         - registrationNumber
-        - firstName
         - lastName
+        - firstName
         - gender
         - classId
         - className
@@ -1200,9 +1247,11 @@ components:
     CreateStudentBody:
       type: object
       properties:
-        firstName:
-          type: string
         lastName:
+          type: string
+        postnom:
+          type: ["string", "null"]
+        firstName:
           type: string
         gender:
           type: string
@@ -1215,15 +1264,28 @@ components:
           type: ["string", "null"]
         motherName:
           type: ["string", "null"]
+        fonction:
+          type: ["string", "null"]
         address:
           type: ["string", "null"]
+        confession:
+          type: ["string", "null"]
+        ecoleProvenance:
+          type: ["string", "null"]
+        bulletinsPresentes:
+          type: array
+          items:
+            type: string
+          nullable: true
+        pourcentagePrecedent:
+          type: ["number", "null"]
         classId:
           type: integer
         academicYear:
           type: string
       required:
-        - firstName
         - lastName
+        - firstName
         - gender
         - classId
         - academicYear
@@ -1231,9 +1293,11 @@ components:
     UpdateStudentBody:
       type: object
       properties:
-        firstName:
-          type: ["string", "null"]
         lastName:
+          type: ["string", "null"]
+        postnom:
+          type: ["string", "null"]
+        firstName:
           type: ["string", "null"]
         gender:
           type: ["string", "null"]
@@ -1246,8 +1310,21 @@ components:
           type: ["string", "null"]
         motherName:
           type: ["string", "null"]
+        fonction:
+          type: ["string", "null"]
         address:
           type: ["string", "null"]
+        confession:
+          type: ["string", "null"]
+        ecoleProvenance:
+          type: ["string", "null"]
+        bulletinsPresentes:
+          type: array
+          items:
+            type: string
+          nullable: true
+        pourcentagePrecedent:
+          type: ["number", "null"]
         classId:
           type: ["integer", "null"]
 

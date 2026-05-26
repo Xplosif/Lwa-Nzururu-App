@@ -19,12 +19,13 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { href: "/", label: "Tableau de bord", icon: LayoutDashboard, roles: ["proviseur", "titulaire", "enseignant"] },
+  { href: "/", label: "Tableau de bord", icon: LayoutDashboard, roles: ["proviseur", "titulaire", "enseignant", "secretaire"] },
   { href: "/students", label: "Eleves", icon: GraduationCap, roles: ["proviseur", "titulaire", "secretaire"] },
   { href: "/teachers", label: "Personnel", icon: Users, roles: ["proviseur"] },
   { href: "/classes", label: "Classes", icon: BookOpen, roles: ["proviseur", "titulaire"] },
   { href: "/subjects", label: "Matieres", icon: BookOpen, roles: ["proviseur"] },
   { href: "/grades", label: "Notes", icon: ClipboardList, roles: ["proviseur", "enseignant", "titulaire"] },
+  { href: "/proclamation", label: "Proclamation", icon: FileText, roles: ["titulaire"] },
   { href: "/archives", label: "Archives", icon: Archive, roles: ["proviseur"] },
   { href: "/reports", label: "Rapports PDF", icon: FileText, roles: ["proviseur", "titulaire"] },
   { href: "/settings", label: "Parametres", icon: Settings, roles: ["proviseur"] },
@@ -53,11 +54,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     (item) => user && item.roles.includes(user.role)
   );
 
-  const roleLabel = {
+  const roleLabel: Record<string, string> = {
     proviseur: "Proviseur",
     enseignant: "Enseignant",
     titulaire: "Titulaire de classe",
     secretaire: "Secretaire",
+    parent: "Parent d'eleve",
   };
 
   const currentNav = filteredNav.find(

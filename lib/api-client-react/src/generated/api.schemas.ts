@@ -184,8 +184,10 @@ export const StudentGender = {
 export interface Student {
   id: number;
   registrationNumber: string;
-  firstName: string;
   lastName: string;
+  /** @nullable */
+  postnom?: string | null;
+  firstName: string;
   gender: StudentGender;
   /** @nullable */
   dateOfBirth?: string | null;
@@ -196,12 +198,30 @@ export interface Student {
   /** @nullable */
   motherName?: string | null;
   /** @nullable */
+  fonction?: string | null;
+  /** @nullable */
   address?: string | null;
+  /** @nullable */
+  confession?: string | null;
+  /** @nullable */
+  ecoleProvenance?: string | null;
+  bulletinsPresentes?: string[] | null;
+  /** @nullable */
+  pourcentagePrecedent?: number | null;
   classId: number;
   className: string;
   academicYear: string;
   createdAt: string;
 }
+
+export type StudentCreatedParentCredentials = {
+  username: string;
+  password: string;
+} | null;
+
+export type StudentCreated = Student & {
+  parentCredentials?: StudentCreatedParentCredentials;
+};
 
 export type StudentDetailGender =
   (typeof StudentDetailGender)[keyof typeof StudentDetailGender];
@@ -240,8 +260,10 @@ export interface Grade {
 export interface StudentDetail {
   id: number;
   registrationNumber: string;
-  firstName: string;
   lastName: string;
+  /** @nullable */
+  postnom?: string | null;
+  firstName: string;
   gender: StudentDetailGender;
   /** @nullable */
   dateOfBirth?: string | null;
@@ -252,7 +274,16 @@ export interface StudentDetail {
   /** @nullable */
   motherName?: string | null;
   /** @nullable */
+  fonction?: string | null;
+  /** @nullable */
   address?: string | null;
+  /** @nullable */
+  confession?: string | null;
+  /** @nullable */
+  ecoleProvenance?: string | null;
+  bulletinsPresentes?: string[] | null;
+  /** @nullable */
+  pourcentagePrecedent?: number | null;
   classId: number;
   className: string;
   academicYear: string;
@@ -275,8 +306,10 @@ export const CreateStudentBodyGender = {
 } as const;
 
 export interface CreateStudentBody {
-  firstName: string;
   lastName: string;
+  /** @nullable */
+  postnom?: string | null;
+  firstName: string;
   gender: CreateStudentBodyGender;
   /** @nullable */
   dateOfBirth?: string | null;
@@ -287,7 +320,16 @@ export interface CreateStudentBody {
   /** @nullable */
   motherName?: string | null;
   /** @nullable */
+  fonction?: string | null;
+  /** @nullable */
   address?: string | null;
+  /** @nullable */
+  confession?: string | null;
+  /** @nullable */
+  ecoleProvenance?: string | null;
+  bulletinsPresentes?: string[] | null;
+  /** @nullable */
+  pourcentagePrecedent?: number | null;
   classId: number;
   academicYear: string;
 }
@@ -306,9 +348,11 @@ export const UpdateStudentBodyGender = {
 
 export interface UpdateStudentBody {
   /** @nullable */
-  firstName?: string | null;
-  /** @nullable */
   lastName?: string | null;
+  /** @nullable */
+  postnom?: string | null;
+  /** @nullable */
+  firstName?: string | null;
   /** @nullable */
   gender?: UpdateStudentBodyGender;
   /** @nullable */
@@ -320,7 +364,16 @@ export interface UpdateStudentBody {
   /** @nullable */
   motherName?: string | null;
   /** @nullable */
+  fonction?: string | null;
+  /** @nullable */
   address?: string | null;
+  /** @nullable */
+  confession?: string | null;
+  /** @nullable */
+  ecoleProvenance?: string | null;
+  bulletinsPresentes?: string[] | null;
+  /** @nullable */
+  pourcentagePrecedent?: number | null;
   /** @nullable */
   classId?: number | null;
 }

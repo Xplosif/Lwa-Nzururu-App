@@ -9,6 +9,7 @@ export const usersTable = pgTable("users", {
   fullName: text("full_name").notNull(),
   role: text("role").notNull().default("enseignant"),
   classId: integer("class_id"),
+  studentId: integer("student_id"),
   isFirstLogin: boolean("is_first_login").notNull().default(true),
   tempUsername: text("temp_username"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

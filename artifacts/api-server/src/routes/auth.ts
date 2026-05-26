@@ -39,7 +39,7 @@ router.post("/auth/login", async (req, res): Promise<void> => {
       ? await db.select().from(classesTable).where(eq(classesTable.id, userByTemp.classId))
       : [];
 
-    req.session = req.session || {};
+    (req as any).session = (req as any).session || {};
     (req as any).session.userId = userByTemp.id;
     res.json({
       user: {

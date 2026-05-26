@@ -1,0 +1,43 @@
+IMPORTANT : Ne recommence pas l'application à zéro. L'application est déjà générée et fonctionnelle. Ton objectif est uniquement d'AMÉLIORER, de REFACTORISER et d'AJUSTER le code existant en suivant les précisions et modifications ci-dessous.
+
+---
+
+## 1. RÉORGANISATION DE L'ARBORESCENCE (Sans perte de code)
+Sans supprimer la logique actuelle, réorganise les fichiers existants pour séparer proprement le Frontend et le Backend :
+- Déplace la logique API, modèles, et routes dans un dossier `/backend`.
+- Déplace les fichiers d'interface, composants et styles dans un dossier `/frontend`.
+- Mets à jour les scripts de démarrage (ex: package.json principal) pour que les deux parties continuent de communiquer correctement après ce déplacement.
+
+---
+
+## 2. REFACTORING DES RÔLES : MODULE PROVISEUR
+- REPRIME (supprime) définitivement la fonctionnalité d'inscription des élèves du tableau de bord du Proviseur. Il n'a plus ce droit.
+- Conserve et ajuste ses droits de création :
+  1. Création des Classes : Assure-toi que les niveaux "7ème" et "8ème" soient traités comme deux niveaux d'études distincts et indépendants (pas de tronc commun).
+  2. Création du Personnel : Ajuste la logique pour qu'il puisse attribuer les fonctions suivantes : Secrétaire, Enseignant, et Enseignant Titulaire (un titulaire reste un enseignant, mais avec la responsabilité exclusive d'une classe spécifique).
+
+---
+
+## 3. MODIFICATION DU MODULE SECRÉTAIRE & FORMULAIRE
+- Transfère le droit d'inscription des élèves exclusivement au Secrétaire (dans les classes déjà créées par le proviseur).
+- Modifie le formulaire d'inscription existant pour insérer le champ "Prénom" juste en dessous de "Nom". Réordonne STRICTEMENT les champs pour obtenir cet ordre précis :
+  1. Nom, 2. Postnom, 3. Prénom, 4. Sexe, 5. Date de naissance, 6. Lieu de naissance, 7. Père, 8. Mère, 9. Fonction, 10. Adresse, 11. Confession, 12. École de provenance.
+  13. Bulletins présentés : Remplace l'ancien système par des cases à cocher (Checkboxes) pour la 1ère, 2ème, 3ème, 5ème et 6ème. Le secrétaire coche uniquement ceux présentés.
+  14. % (Pourcentage), 15. Classe sollicitée (Menu déroulant basé sur les classes du proviseur).
+
+---
+
+## 4. AJOUT DE LA LOGIQUE : COMPTE PARENT AUTOMATIQUE
+- Modifie la fonction de soumission du formulaire d'inscription : dès que le secrétaire crée l'élève, génère automatiquement en arrière-plan un compte Parent lié.
+- Attribue des identifiants initiaux temporaires.
+- Ajoute une règle/middleware : lors de la première connexion du parent, redirige-le obligatoirement vers une page pour modifier ses identifiants afin qu'il en choisisse des mémorisables.
+
+---
+
+## 5. AJUSTEMENT DES ESPACES ENSEIGNANT ET TITULAIRE
+- **Espace Enseignant (Ajustement)** : Limite son accès visuel aux seules classes où il enseigne. Il peut y créer des évaluations et encoder les notes de ses cours. Bloque-lui l'accès aux moyennes générales et aux résultats finaux.
+- **Espace Titulaire (Extension)** : En plus de ses droits d'enseignant, ajoute-lui un flux ou un tableau de bord où il reçoit automatiquement toutes les notes encodées par les autres collègues pour les élèves de sa classe. Ajoute-lui la fonctionnalité exclusive de calcul des résultats finaux et de proclamation.
+
+---
+
+Applique ces modifications par étapes sur le code actuel. Ne génère pas de fichiers vides, base-toi sur l'existant. Dis-moi par quelle partie tu souhaites commencer.

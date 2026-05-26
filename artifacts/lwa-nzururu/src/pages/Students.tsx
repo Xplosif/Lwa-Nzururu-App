@@ -41,7 +41,7 @@ export default function Students() {
       s.registrationNumber.toLowerCase().includes(search.toLowerCase())
   );
 
-  const canManage = user?.role === "proviseur" || user?.role === "secretaire";
+  const canManage = user?.role === "secretaire";
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
