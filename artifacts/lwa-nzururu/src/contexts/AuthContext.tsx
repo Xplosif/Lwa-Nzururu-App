@@ -5,9 +5,10 @@ export interface AuthUser {
   id: number;
   username: string;
   fullName: string;
-  role: "proviseur" | "enseignant" | "titulaire" | "secretaire";
+  role: "proviseur" | "enseignant" | "titulaire" | "secretaire" | "parent";
   classId?: number | null;
   className?: string | null;
+  studentId?: number | null;
   isFirstLogin: boolean;
   createdAt: string;
 }

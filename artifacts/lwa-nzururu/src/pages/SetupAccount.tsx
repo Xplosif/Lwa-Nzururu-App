@@ -20,8 +20,9 @@ export default function SetupAccount() {
   const setupMutation = useSetupAccount({
     mutation: {
       onSuccess: (data) => {
-        setUser(data.user as any);
-        navigate("/");
+        const u = data.user as any;
+        setUser(u);
+        navigate(u?.role === "parent" ? "/bulletin" : "/");
       },
       onError: (err: any) => {
         setError(err?.data?.error || "Erreur lors de la configuration");

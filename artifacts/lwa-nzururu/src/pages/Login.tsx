@@ -19,10 +19,13 @@ export default function Login() {
   const loginMutation = useLogin({
     mutation: {
       onSuccess: (data) => {
-        setUser(data.user as any);
+        const u = data.user as any;
+        setUser(u);
         queryClient.invalidateQueries();
         if (data.requiresSetup) {
           navigate("/setup-account");
+        } else if (u?.role === "parent") {
+          navigate("/bulletin");
         } else {
           navigate("/");
         }
