@@ -27,6 +27,10 @@ tags:
     description: Annual archives
   - name: reports
     description: PDF report generation
+  - name: messages
+    description: In-app messaging
+  - name: profile
+    description: User profile management
 
 paths:
   /healthz:
@@ -948,6 +952,82 @@ paths:
               schema:
                 $ref: "#/components/schemas/DeliberationBonusEntry"
 
+  /auth/profile:
+    put:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileBody"
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /messages:
+    get:
+      operationId: listMessages
+      tags: [messages]
+      summary: Get messages in a conversation
+      parameters:
+        - name: withUserId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageBody"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /messages/unread-count:
+    get:
+      operationId: getUnreadCount
+      tags: [messages]
+      summary: Get count of unread messages
+      responses:
+        "200":
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnreadCount"
+
   /parent/bulletin:
     get:
       operationId: getParentBulletin
@@ -978,6 +1058,61 @@ paths:
 
 components:
   schemas:
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
+        content:
+          type: string
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+        fromFullName:
+          type: string
+      required:
+        - id
+        - fromUserId
+        - toUserId
+        - content
+        - isRead
+        - createdAt
+        - fromFullName
+
+    SendMessageBody:
+      type: object
+      properties:
+        toUserId:
+          type: integer
+        content:
+          type: string
+      required:
+        - toUserId
+        - content
+
+    UnreadCount:
+      type: object
+      properties:
+        count:
+          type: integer
+      required:
+        - count
+
+    UpdateProfileBody:
+      type: object
+      properties:
+        fullName:
+          type: string
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+
     HealthStatus:
       type: object
       properties:
@@ -1068,11 +1203,13 @@ components:
           type: string
         role:
           type: string
-          enum: [proviseur, enseignant, titulaire, secretaire]
+          enum: [proviseur, enseignant, titulaire, secretaire, parent]
         classId:
           type: ["integer", "null"]
         className:
           type: ["string", "null"]
+        studentId:
+          type: ["integer", "null"]
         isFirstLogin:
           type: boolean
         createdAt:
@@ -2109,6 +2246,10 @@ components:
           type: boolean
         bonusPoints:
           type: number
+        titulaireUserId:
+          type: ["integer", "null"]
+        titulaireFullName:
+          type: ["string", "null"]
       required:
         - studentId
         - registrationNumber

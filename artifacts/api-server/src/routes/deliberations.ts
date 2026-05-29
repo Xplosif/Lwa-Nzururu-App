@@ -418,6 +418,12 @@ router.get("/parent/bulletin", async (req, res): Promise<void> => {
   const sorted = classScores.sort((a, b) => b.score - a.score);
   const rank = sorted.findIndex((s) => s.id === student.id) + 1;
 
+  const titulaireUsers = await db
+    .select()
+    .from(usersTable)
+    .where(and(eq(usersTable.role, "titulaire"), eq(usersTable.classId, student.classId)));
+  const titulaire = titulaireUsers[0] || null;
+
   res.json({
     studentId: student.id,
     registrationNumber: student.registrationNumber,
@@ -434,6 +440,8 @@ router.get("/parent/bulletin", async (req, res): Promise<void> => {
     totalStudentsInClass: allClassStudents.length,
     passed,
     bonusPoints,
+    titulaireUserId: titulaire?.id || null,
+    titulaireFullName: titulaire?.fullName || null,
   });
 });
 

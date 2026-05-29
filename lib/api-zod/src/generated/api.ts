@@ -27,9 +27,16 @@ export const LoginResponse = zod.object({
     id: zod.number(),
     username: zod.string(),
     fullName: zod.string(),
-    role: zod.enum(["proviseur", "enseignant", "titulaire", "secretaire"]),
+    role: zod.enum([
+      "proviseur",
+      "enseignant",
+      "titulaire",
+      "secretaire",
+      "parent",
+    ]),
     classId: zod.number().nullish(),
     className: zod.string().nullish(),
+    studentId: zod.number().nullish(),
     isFirstLogin: zod.boolean(),
     createdAt: zod.string(),
   }),
@@ -51,9 +58,16 @@ export const GetMeResponse = zod.object({
   id: zod.number(),
   username: zod.string(),
   fullName: zod.string(),
-  role: zod.enum(["proviseur", "enseignant", "titulaire", "secretaire"]),
+  role: zod.enum([
+    "proviseur",
+    "enseignant",
+    "titulaire",
+    "secretaire",
+    "parent",
+  ]),
   classId: zod.number().nullish(),
   className: zod.string().nullish(),
+  studentId: zod.number().nullish(),
   isFirstLogin: zod.boolean(),
   createdAt: zod.string(),
 });
@@ -87,9 +101,16 @@ export const SetupAccountResponse = zod.object({
     id: zod.number(),
     username: zod.string(),
     fullName: zod.string(),
-    role: zod.enum(["proviseur", "enseignant", "titulaire", "secretaire"]),
+    role: zod.enum([
+      "proviseur",
+      "enseignant",
+      "titulaire",
+      "secretaire",
+      "parent",
+    ]),
     classId: zod.number().nullish(),
     className: zod.string().nullish(),
+    studentId: zod.number().nullish(),
     isFirstLogin: zod.boolean(),
     createdAt: zod.string(),
   }),
@@ -103,9 +124,16 @@ export const ListUsersResponseItem = zod.object({
   id: zod.number(),
   username: zod.string(),
   fullName: zod.string(),
-  role: zod.enum(["proviseur", "enseignant", "titulaire", "secretaire"]),
+  role: zod.enum([
+    "proviseur",
+    "enseignant",
+    "titulaire",
+    "secretaire",
+    "parent",
+  ]),
   classId: zod.number().nullish(),
   className: zod.string().nullish(),
+  studentId: zod.number().nullish(),
   isFirstLogin: zod.boolean(),
   createdAt: zod.string(),
 });
@@ -131,9 +159,16 @@ export const GetUserResponse = zod.object({
   id: zod.number(),
   username: zod.string(),
   fullName: zod.string(),
-  role: zod.enum(["proviseur", "enseignant", "titulaire", "secretaire"]),
+  role: zod.enum([
+    "proviseur",
+    "enseignant",
+    "titulaire",
+    "secretaire",
+    "parent",
+  ]),
   classId: zod.number().nullish(),
   className: zod.string().nullish(),
+  studentId: zod.number().nullish(),
   isFirstLogin: zod.boolean(),
   createdAt: zod.string(),
 });
@@ -162,9 +197,16 @@ export const UpdateUserResponse = zod.object({
   id: zod.number(),
   username: zod.string(),
   fullName: zod.string(),
-  role: zod.enum(["proviseur", "enseignant", "titulaire", "secretaire"]),
+  role: zod.enum([
+    "proviseur",
+    "enseignant",
+    "titulaire",
+    "secretaire",
+    "parent",
+  ]),
   classId: zod.number().nullish(),
   className: zod.string().nullish(),
+  studentId: zod.number().nullish(),
   isFirstLogin: zod.boolean(),
   createdAt: zod.string(),
 });
@@ -960,6 +1002,66 @@ export const SetDeliberationBonusResponse = zod.object({
 });
 
 /**
+ * @summary Update current user profile
+ */
+export const UpdateProfileBody = zod.object({
+  fullName: zod.string().optional(),
+  currentPassword: zod.string().optional(),
+  newPassword: zod.string().optional(),
+});
+
+export const UpdateProfileResponse = zod.object({
+  id: zod.number(),
+  username: zod.string(),
+  fullName: zod.string(),
+  role: zod.enum([
+    "proviseur",
+    "enseignant",
+    "titulaire",
+    "secretaire",
+    "parent",
+  ]),
+  classId: zod.number().nullish(),
+  className: zod.string().nullish(),
+  studentId: zod.number().nullish(),
+  isFirstLogin: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Get messages in a conversation
+ */
+export const ListMessagesQueryParams = zod.object({
+  withUserId: zod.coerce.number(),
+});
+
+export const ListMessagesResponseItem = zod.object({
+  id: zod.number(),
+  fromUserId: zod.number(),
+  toUserId: zod.number(),
+  content: zod.string(),
+  isRead: zod.boolean(),
+  createdAt: zod.string(),
+  fromFullName: zod.string(),
+});
+export const ListMessagesResponse = zod.array(ListMessagesResponseItem);
+
+/**
+ * @summary Send a message
+ */
+export const SendMessageBody = zod.object({
+  toUserId: zod.number(),
+  content: zod.string(),
+});
+
+/**
+ * @summary Get count of unread messages
+ */
+export const GetUnreadCountResponse = zod.object({
+  count: zod.number(),
+});
+
+/**
  * @summary Get the authenticated parent's child bulletin (only if deliberation approved)
  */
 export const GetParentBulletinQueryParams = zod.object({
@@ -1000,4 +1102,6 @@ export const GetParentBulletinResponse = zod.object({
   totalStudentsInClass: zod.number(),
   passed: zod.boolean(),
   bonusPoints: zod.number(),
+  titulaireUserId: zod.number().nullish(),
+  titulaireFullName: zod.string().nullish(),
 });

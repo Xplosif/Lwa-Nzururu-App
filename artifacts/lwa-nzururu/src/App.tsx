@@ -22,6 +22,8 @@ import Settings from "@/pages/Settings";
 import Proclamation from "@/pages/Proclamation";
 import Deliberation from "@/pages/Deliberation";
 import ParentBulletin from "@/pages/ParentBulletin";
+import ProfileSettings from "@/pages/ProfileSettings";
+import MessagesPage from "@/pages/MessagesPage";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30000 } },
@@ -103,6 +105,10 @@ function AppRoutes() {
         <Route path="/reports" component={Reports} />
         <Route path="/settings">
           <ProtectedRoute component={Settings} roles={["proviseur"]} />
+        </Route>
+        <Route path="/profile" component={ProfileSettings} />
+        <Route path="/messages">
+          <ProtectedRoute component={MessagesPage} roles={["titulaire", "parent"]} />
         </Route>
         <Route path="/login"><Redirect to="/" /></Route>
         <Route component={NotFound} />

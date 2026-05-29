@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLogout } from "@workspace/api-client-react";
+import { useLogout, useGetUnreadCount, getGetUnreadCountQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutDashboard,
@@ -16,6 +16,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  MessageCircle,
+  UserCog,
 } from "lucide-react";
 
 const navItems = [
@@ -28,9 +30,11 @@ const navItems = [
   { href: "/proclamation", label: "Proclamation", icon: FileText, roles: ["titulaire"] },
   { href: "/deliberation", label: "Deliberation", icon: ClipboardList, roles: ["proviseur"] },
   { href: "/bulletin", label: "Bulletin de mon enfant", icon: GraduationCap, roles: ["parent"] },
+  { href: "/messages", label: "Messages", icon: MessageCircle, roles: ["titulaire", "parent"], badge: true },
   { href: "/archives", label: "Archives", icon: Archive, roles: ["proviseur"] },
   { href: "/reports", label: "Rapports PDF", icon: FileText, roles: ["proviseur", "titulaire"] },
-  { href: "/settings", label: "Parametres", icon: Settings, roles: ["proviseur"] },
+  { href: "/settings", label: "Parametres ecole", icon: Settings, roles: ["proviseur"] },
+  { href: "/profile", label: "Mon profil", icon: UserCog, roles: ["proviseur", "enseignant", "titulaire", "secretaire", "parent"] },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -39,6 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const queryClient = useQueryClient();
+
   const logoutMutation = useLogout({
     mutation: {
       onSuccess: () => {
@@ -47,6 +52,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       },
     },
   });
+
+  const { data: unreadData } = useGetUnreadCount({
+    query: {
+      queryKey: getGetUnreadCountQueryKey(),
+      refetchInterval: 8000,
+      enabled: !!user,
+    },
+  });
+  const unreadCount = unreadData?.count || 0;
 
   useEffect(() => {
     setMobileOpen(false);
@@ -83,21 +97,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <span className="font-bold text-sidebar-primary text-sm truncate">Institut Lwa-Nzururu</span>
           <span className="text-sidebar-foreground/60 text-[10px] truncate">{currentNav?.label || "Butembo, Nord-Kivu"}</span>
         </div>
-        <button
-          onClick={() => logoutMutation.mutate()}
-          className="p-2 rounded text-destructive hover:bg-destructive/10"
-          aria-label="Deconnexion"
-        >
-          <LogOut size={18} />
-        </button>
+        <div className="flex items-center gap-1">
+          {unreadCount > 0 && (
+            <Link href="/messages">
+              <div className="relative p-1.5">
+                <MessageCircle size={18} className="text-sidebar-foreground" />
+                <span className="absolute -top-0.5 -right-0.5 bg-destructive text-white text-[9px] rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              </div>
+            </Link>
+          )}
+          <button
+            onClick={() => logoutMutation.mutate()}
+            className="p-2 rounded text-destructive hover:bg-destructive/10"
+            aria-label="Deconnexion"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
       </header>
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/40 z-30"
-          onClick={() => setMobileOpen(false)}
-        />
+        <div className="md:hidden fixed inset-0 bg-black/40 z-30" onClick={() => setMobileOpen(false)} />
       )}
 
       {/* Sidebar */}
@@ -134,6 +157,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {filteredNav.map((item) => {
             const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
             const showLabel = desktopOpen || mobileOpen;
+            const showBadge = item.badge && unreadCount > 0;
             return (
               <Link key={item.href} href={item.href}>
                 <div
@@ -143,9 +167,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   }`}
                 >
-                  <item.icon size={18} className="flex-shrink-0" />
-                  {showLabel && <span className="truncate">{item.label}</span>}
-                  {showLabel && isActive && <ChevronRight size={14} className="ml-auto flex-shrink-0" />}
+                  <div className="relative flex-shrink-0">
+                    <item.icon size={18} />
+                    {showBadge && !showLabel && (
+                      <span className="absolute -top-1 -right-1 bg-destructive text-white text-[9px] rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  {showLabel && <span className="flex-1 truncate">{item.label}</span>}
+                  {showLabel && showBadge && (
+                    <span className="ml-auto bg-destructive text-white text-xs rounded-full min-w-[18px] h-4.5 flex items-center justify-center px-1">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                  {showLabel && isActive && !showBadge && <ChevronRight size={14} className="ml-auto flex-shrink-0" />}
                 </div>
               </Link>
             );

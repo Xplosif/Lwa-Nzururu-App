@@ -5,6 +5,31 @@
  * Institut Lwa-Nzururu - Système de gestion scolaire
  * OpenAPI spec version: 0.1.0
  */
+export interface Message {
+  id: number;
+  fromUserId: number;
+  toUserId: number;
+  content: string;
+  isRead: boolean;
+  createdAt: string;
+  fromFullName: string;
+}
+
+export interface SendMessageBody {
+  toUserId: number;
+  content: string;
+}
+
+export interface UnreadCount {
+  count: number;
+}
+
+export interface UpdateProfileBody {
+  fullName?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -30,6 +55,7 @@ export const UserRole = {
   enseignant: "enseignant",
   titulaire: "titulaire",
   secretaire: "secretaire",
+  parent: "parent",
 } as const;
 
 export interface User {
@@ -41,6 +67,8 @@ export interface User {
   classId?: number | null;
   /** @nullable */
   className?: string | null;
+  /** @nullable */
+  studentId?: number | null;
   isFirstLogin: boolean;
   createdAt: string;
 }
@@ -658,6 +686,10 @@ export interface ParentBulletinResult {
   totalStudentsInClass: number;
   passed: boolean;
   bonusPoints: number;
+  /** @nullable */
+  titulaireUserId?: number | null;
+  /** @nullable */
+  titulaireFullName?: string | null;
 }
 
 export type ListStudentsParams = {
@@ -709,6 +741,10 @@ export type GeneratePalmaresParams = {
 export type ListDeliberationsParams = {
   classId?: number | null;
   academicYear?: string | null;
+};
+
+export type ListMessagesParams = {
+  withUserId: number;
 };
 
 export type GetParentBulletinParams = {

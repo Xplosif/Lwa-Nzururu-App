@@ -192,6 +192,54 @@ router.post("/auth/setup-account", async (req, res): Promise<void> => {
   });
 });
 
+router.put("/auth/profile", async (req, res): Promise<void> => {
+  const userId = (req as any).session?.userId;
+  if (!userId) { res.status(401).json({ error: "Non authentifie" }); return; }
+
+  const { fullName, currentPassword, newPassword } = req.body;
+  const updates: Partial<typeof usersTable.$inferInsert> = {};
+
+  if (typeof fullName === "string" && fullName.trim()) {
+    updates.fullName = fullName.trim();
+  }
+
+  if (newPassword) {
+    if (!currentPassword) { res.status(400).json({ error: "Mot de passe actuel requis" }); return; }
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
+    if (!user || !verifyPassword(currentPassword, user.passwordHash)) {
+      res.status(400).json({ error: "Mot de passe actuel incorrect" }); return;
+    }
+    if (typeof newPassword !== "string" || newPassword.length < 6) {
+      res.status(400).json({ error: "Le nouveau mot de passe doit faire au moins 6 caracteres" }); return;
+    }
+    updates.passwordHash = hashPassword(newPassword);
+  }
+
+  if (Object.keys(updates).length === 0) { res.status(400).json({ error: "Aucune donnee a mettre a jour" }); return; }
+
+  const [updated] = await db.update(usersTable).set(updates).where(eq(usersTable.id, userId)).returning();
+
+  const [cls] = updated.classId ? await db.select().from(classesTable).where(eq(classesTable.id, updated.classId)) : [null];
+
+  const session = (req as any).session;
+  const userObj = {
+    id: updated.id,
+    username: updated.username,
+    fullName: updated.fullName,
+    role: updated.role,
+    classId: updated.classId,
+    className: cls?.name || null,
+    isFirstLogin: updated.isFirstLogin,
+    createdAt: updated.createdAt,
+  };
+  if (session) {
+    session.userId = updated.id;
+    session.role = updated.role;
+  }
+
+  res.json(userObj);
+});
+
 router.post("/auth/change-password", async (req, res): Promise<void> => {
   const userId = (req as any).session?.userId;
   if (!userId) {
