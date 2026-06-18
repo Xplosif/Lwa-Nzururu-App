@@ -112,7 +112,7 @@ function AppRoutes() {
         </Route>
         <Route path="/profile" component={ProfileSettings} />
         <Route path="/messages">
-          <ProtectedRoute component={MessagesPage} roles={["titulaire", "parent"]} />
+          <ProtectedRoute component={MessagesPage} roles={["proviseur", "titulaire", "enseignant", "parent"]} />
         </Route>
         <Route path="/login"><Redirect to="/" /></Route>
         <Route component={NotFound} />

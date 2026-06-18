@@ -30,7 +30,7 @@ const navItems = [
   { href: "/proclamation", label: "Proclamation", icon: FileText, roles: ["titulaire"] },
   { href: "/deliberation", label: "Deliberation", icon: ClipboardList, roles: ["proviseur"] },
   { href: "/bulletin", label: "Bulletin de mon enfant", icon: GraduationCap, roles: ["parent"] },
-  { href: "/messages", label: "Messages", icon: MessageCircle, roles: ["proviseur", "titulaire", "parent"], badge: true },
+  { href: "/messages", label: "Messages", icon: MessageCircle, roles: ["proviseur", "titulaire", "enseignant", "parent"], badge: true },
   { href: "/archives", label: "Archives", icon: Archive, roles: ["proviseur"] },
   { href: "/reports", label: "Rapports PDF", icon: FileText, roles: ["proviseur", "titulaire"] },
   { href: "/settings", label: "Parametres ecole", icon: Settings, roles: ["proviseur"] },
