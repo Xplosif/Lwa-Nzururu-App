@@ -1,85 +1,65 @@
-import { useEffect, useRef } from "react";
+import { DiagramPage } from "../../lib/DiagramWrapper";
 
-const DIAGRAM = `
+const D = `
 sequenceDiagram
     autonumber
     actor PA as Parent
     actor SE as Secretaire
-    actor EN as Enseignant/Titulaire
+    actor EN as Enseignant
+    actor TI as Titulaire
     actor PR as Proviseur
     participant API as API Server
     participant DB as PostgreSQL
 
-    Note over SE,DB: Inscription d'un eleve
-    SE->>API: POST /students (donnees eleve)
-    API->>DB: INSERT INTO students
-    DB-->>API: id, registration_number
-    API->>DB: INSERT INTO users (compte parent)
-    DB-->>API: username, temp_password
-    API-->>SE: { parentCredentials }
-    SE-->>PA: Transmettre identifiants
+    rect rgb(230, 245, 255)
+        Note over SE,DB: Flux 1 — Inscription d'un eleve
+        SE->>API: POST /students (etat civil + classe)
+        API->>DB: INSERT INTO students
+        DB-->>API: id, registration_number
+        API->>DB: INSERT INTO users (compte parent)
+        DB-->>API: username, temp_password
+        API-->>SE: parentCredentials
+        SE-->>PA: Transmettre identifiants
+    end
 
-    Note over EN,DB: Saisie des notes
-    EN->>API: PUT /grades/:id {period, value}
-    API->>DB: UPDATE grades
-    DB-->>API: OK
-    API-->>EN: Note enregistree
+    rect rgb(230, 255, 235)
+        Note over EN,DB: Flux 2 — Saisie des notes
+        EN->>API: POST /grades (studentId, subjectId, period, value)
+        API->>DB: INSERT INTO grades
+        DB-->>API: grade id
+        API-->>EN: Note enregistree
+    end
 
-    Note over EN,PR: Deliberation
-    EN->>API: POST /proclamation (cloturer)
-    API->>DB: Marquer deliberation close
-    PR->>API: POST /deliberation (approuver)
-    API->>DB: Valider resultats finaux
-    DB-->>API: OK
-    API-->>PR: Resultats valides
+    rect rgb(255, 245, 230)
+        Note over TI,PR: Flux 3 — Deliberation
+        TI->>API: POST /deliberations (classId, semester)
+        API->>DB: Calcul moyennes automatique
+        PR->>API: POST /deliberations/:id/bonus
+        API->>DB: Enregistrer bonus
+        PR->>API: POST /deliberations/:id/approve
+        API->>DB: approvedByProviseur = true
+        API-->>PR: Bulletins publies
+    end
 
-    Note over PA,DB: Consultation bulletin
-    PA->>API: GET /bulletin?semester=S1
-    API->>DB: SELECT notes + rang eleve
-    DB-->>API: Donnees bulletin
-    API-->>PA: { notes, rang, percentage }
+    rect rgb(245, 230, 255)
+        Note over PA,DB: Flux 4 — Consultation bulletin
+        PA->>API: GET /parent/bulletin?semester=S1
+        API->>DB: SELECT grades + rank + average
+        DB-->>API: Donnees bulletin
+        API-->>PA: Bulletin JSON
+    end
 
-    Note over PA,PR: Communication
-    PA->>API: POST /messages {toUserId: proviseurId}
-    API->>DB: INSERT INTO messages
-    PR->>API: GET /messages (polling 5s)
-    API-->>PR: Nouveaux messages
-    PR->>API: POST /messages (reponse)
-    API-->>PA: Message recu
+    rect rgb(255, 230, 230)
+        Note over PA,PR: Flux 5 — Chat parent-proviseur
+        PA->>API: POST /messages (toUserId=proviseurId)
+        API->>DB: INSERT INTO messages
+        PR->>API: GET /messages/conversations (polling)
+        API-->>PR: Messages recus
+        PR->>API: POST /messages (reponse)
+        API-->>PA: Reponse recue
+    end
 `;
 
 export default function DiagramSequence() {
-  const ref = useRef<HTMLPreElement>(null);
-
-  useEffect(() => {
-    const existing = document.getElementById("mermaid-script");
-    if (existing) { initMermaid(); return; }
-    const script = document.createElement("script");
-    script.id = "mermaid-script";
-    script.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
-    script.onload = initMermaid;
-    document.head.appendChild(script);
-
-    function initMermaid() {
-      const m = (window as any).mermaid;
-      if (!m || !ref.current) return;
-      m.initialize({ startOnLoad: false, theme: "default", securityLevel: "loose" });
-      const id = "mermaid-seq-" + Date.now();
-      m.render(id, DIAGRAM).then(({ svg }: { svg: string }) => {
-        if (ref.current) ref.current.innerHTML = svg;
-      }).catch(console.error);
-    }
-  }, []);
-
-  return (
-    <div style={{ padding: "24px", background: "#f8fafc", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
-      <div style={{ background: "#1e3a5f", color: "#fff", padding: "12px 20px", borderRadius: "8px", marginBottom: "20px" }}>
-        <h2 style={{ margin: 0, fontSize: "16px", fontWeight: 600 }}>Diagramme de sequence</h2>
-        <p style={{ margin: "4px 0 0", fontSize: "12px", opacity: 0.8 }}>Flux principaux : inscription, notes, deliberation, bulletin, chat</p>
-      </div>
-      <div style={{ background: "#fff", borderRadius: "8px", padding: "20px", border: "1px solid #e2e8f0", overflowX: "auto" }}>
-        <pre ref={ref} style={{ margin: 0 }}>Chargement du diagramme...</pre>
-      </div>
-    </div>
-  );
+  return <DiagramPage title="Diagramme de sequence — Flux Principaux du Systeme" subtitle="5 flux : Inscription, Notes, Deliberation, Bulletin, Chat" diagram={D} />;
 }

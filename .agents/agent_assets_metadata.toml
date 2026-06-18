@@ -1,0 +1,128 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "cFslbeeUfw_ZNUT0JXtkV"
+uri = "file://diagrams/01-cas-utilisation-global.jpeg"
+type = "image"
+title = "01 — Cas d'utilisation : Système Global"
+
+[[outputs]]
+id = "z7FjMYSu9-Qq4Uwv0njX9"
+uri = "file://diagrams/02-classes-domaine-complet.jpeg"
+type = "image"
+title = "02 — Classes : Modèle du Domaine Complet"
+
+[[outputs]]
+id = "KPquhlzaDXrdzrbqXfFW4"
+uri = "file://diagrams/03-entite-relation-postgresql.jpeg"
+type = "image"
+title = "03 — Entité-Relation : Schéma PostgreSQL"
+
+[[outputs]]
+id = "3kadB7yvUZXtcwksdNVUV"
+uri = "file://diagrams/04-sequence-flux-principaux.jpeg"
+type = "image"
+title = "04 — Séquence : 5 Flux Principaux"
+
+[[outputs]]
+id = "yWHUpwzo_Ssbc3X8L1FdS"
+uri = "file://diagrams/05-deploiement-architecture.jpeg"
+type = "image"
+title = "05 — Déploiement : Architecture Infrastructure"
+
+[[outputs]]
+id = "09TgAu7zT6cKTxKM2jDWO"
+uri = "file://diagrams/06-cas-authentification.jpeg"
+type = "image"
+title = "06 — Cas d'utilisation : Module Authentification"
+
+[[outputs]]
+id = "z3NR8LXIfpPjBzlmT2B-d"
+uri = "file://diagrams/07-cas-gestion-eleves.jpeg"
+type = "image"
+title = "07 — Cas d'utilisation : Gestion des Élèves"
+
+[[outputs]]
+id = "3krMHkmtwqww1EUC_SeWn"
+uri = "file://diagrams/08-cas-gestion-notes.jpeg"
+type = "image"
+title = "08 — Cas d'utilisation : Gestion des Notes"
+
+[[outputs]]
+id = "bJwmkFwEn2KS3o3j4EQ59"
+uri = "file://diagrams/09-cas-deliberation-bulletins.jpeg"
+type = "image"
+title = "09 — Cas d'utilisation : Délibération et Bulletins"
+
+[[outputs]]
+id = "9DKxYEN5LD8LnaLgLSwGX"
+uri = "file://diagrams/10-cas-gestion-personnel.jpeg"
+type = "image"
+title = "10 — Cas d'utilisation : Gestion du Personnel"
+
+[[outputs]]
+id = "jBiz4IuRUNdJUGp1v8CNI"
+uri = "file://diagrams/11-classes-module-authentification.jpeg"
+type = "image"
+title = "11 — Classes : Module Authentification"
+
+[[outputs]]
+id = "uN7c3q8FQBm85G_SlhwCX"
+uri = "file://diagrams/12-classes-module-academique.jpeg"
+type = "image"
+title = "12 — Classes : Module Académique"
+
+[[outputs]]
+id = "6IERksnGF85mSDRK0idGk"
+uri = "file://diagrams/13-activite-inscription-eleve.jpeg"
+type = "image"
+title = "13 — Activité : Inscription d'un Élève"
+
+[[outputs]]
+id = "1zwQ1NLE0O7-RDTtXYBj5"
+uri = "file://diagrams/14-activite-saisie-notes.jpeg"
+type = "image"
+title = "14 — Activité : Saisie des Notes"
+
+[[outputs]]
+id = "mhn7BZscwS6JJ59vUYr10"
+uri = "file://diagrams/15-activite-deliberation.jpeg"
+type = "image"
+title = "15 — Activité : Processus de Délibération"
+
+[[outputs]]
+id = "lLL153lBCz2ij5lhd6uL8"
+uri = "file://diagrams/16-activite-authentification.jpeg"
+type = "image"
+title = "16 — Activité : Authentification et 1er Accès"
+
+[[outputs]]
+id = "JsgZu4wGVedT7j9W7yR_E"
+uri = "file://diagrams/17-etat-compte-utilisateur.jpeg"
+type = "image"
+title = "17 — État : Cycle de Vie d'un Compte"
+
+[[outputs]]
+id = "i1k3-mAmR46caHPqpCurI"
+uri = "file://diagrams/18-etat-statut-academique.jpeg"
+type = "image"
+title = "18 — État : Statut Académique d'un Élève"
+
+[[outputs]]
+id = "ge1zPVZsMiSMpSOXumJ3e"
+uri = "file://diagrams/19-etat-deliberation.jpeg"
+type = "image"
+title = "19 — État : Processus de Délibération"
+
+[[outputs]]
+id = "_4ngCLGhgvrPXTZ2AxNWO"
+uri = "file://diagrams/20-composants-architecture-logicielle.jpeg"
+type = "image"
+title = "20 — Composants : Architecture Logicielle"
+
+[[outputs]]
+id = "QNC5wXO89DWjxt5Ivz_hA"
+uri = "file://diagrams/21-package-organisation-monorepo.jpeg"
+type = "image"
+title = "21 — Packages : Organisation du Monorepo"

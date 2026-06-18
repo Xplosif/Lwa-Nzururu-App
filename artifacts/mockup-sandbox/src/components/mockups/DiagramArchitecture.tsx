@@ -1,83 +1,65 @@
-import { useEffect, useRef } from "react";
+import { DiagramPage } from "../../lib/DiagramWrapper";
 
-const DIAGRAM = `
+const D = `
 graph TB
-    subgraph CLIENT["Navigateur / PWA (React + Vite)"]
+    subgraph CLIENT["Navigateur PWA — React 18 + Vite"]
         direction LR
-        UI["Interface utilisateur\nTailwind CSS + shadcn/ui"]
-        RQ["TanStack Query\nOrval hooks generes"]
-        WO["Wouter Router\n5 roles / 20+ pages"]
+        UI["shadcn/ui + Tailwind"]
+        RQ["TanStack Query v5"]
+        WO["Wouter — 20+ pages"]
+        PDF["PDF via window.print()"]
     end
 
-    subgraph PROXY["Replit Reverse Proxy (mTLS)"]
-        P1["/ → lwa-nzururu:3000"]
-        P2["/api → api-server:8080"]
-        P3["/__mockup → mockup-sandbox:8081"]
+    subgraph PROXY["Replit Reverse Proxy — mTLS"]
+        direction LR
+        P1["/ --> lwa-nzururu:3000"]
+        P2["/api --> api-server:8080"]
+        P3["/__mockup --> sandbox:8081"]
     end
 
-    subgraph API["API Server (Express 5 / Node 24)"]
+    subgraph API["API Server — Express 5 / Node 24"]
         direction TB
-        AUTH["/api/auth\nSession Map + scrypt\nRBAC middleware"]
-        STU["/api/students\nInscription + bulletins parents"]
-        GRA["/api/grades\nP1 P2 ExS1 P3 P4 ExS2 Bonus"]
-        MSG["/api/messages\nChat temps reel polling 5s"]
-        REP["/api/reports\nBulletin + palmares PDF"]
-        DEL["/api/deliberation\nApprobation proviseur"]
-        ARC["/api/archives\nArchivage annuel"]
+        AUTH["/auth\nSession Map + scrypt\nRBAC par role"]
+        USERS["/users\nGestion personnel"]
+        STU["/students\nInscription + bulletins"]
+        GRA["/grades\nP1 P2 ExS1 P3 P4 ExS2"]
+        DEL["/deliberations\nApprobation Proviseur"]
+        MSG["/messages\nChat polling 5s"]
+        REP["/reports\nBulletin + palmares"]
+        SUBJ["/subjects\nMatieres + affectations"]
+        STAT["/stats\nTableau de bord"]
+        ARC["/archives\nArchivage annuel"]
     end
 
-    subgraph DB["PostgreSQL (Drizzle ORM)"]
+    subgraph DB["PostgreSQL — Drizzle ORM"]
         T1[("users")]
         T2[("students")]
         T3[("grades")]
-        T4[("classes / subjects")]
-        T5[("course_assignments")]
-        T6[("archives / settings")]
+        T4[("classes")]
+        T5[("subjects")]
+        T6[("course_assignments")]
+        T7[("deliberations")]
+        T8[("messages")]
+        T9[("archives")]
+        T10[("settings")]
     end
 
-    CLIENT --> PROXY
+    CLIENT -->|HTTPS| PROXY
     PROXY --> API
     AUTH --> T1
+    USERS --> T1
     STU --> T2
-    GRA --> T3
     STU --> T4
-    GRA --> T4
-    AUTH --> T5
-    ARC --> T6
+    GRA --> T3
+    GRA --> T5
+    DEL --> T7
+    MSG --> T8
+    SUBJ --> T5
+    SUBJ --> T6
+    STAT --> T2 & T3
+    ARC --> T9
 `;
 
 export default function DiagramArchitecture() {
-  const ref = useRef<HTMLPreElement>(null);
-
-  useEffect(() => {
-    const existing = document.getElementById("mermaid-script");
-    if (existing) { initMermaid(); return; }
-    const script = document.createElement("script");
-    script.id = "mermaid-script";
-    script.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
-    script.onload = initMermaid;
-    document.head.appendChild(script);
-
-    function initMermaid() {
-      const m = (window as any).mermaid;
-      if (!m || !ref.current) return;
-      m.initialize({ startOnLoad: false, theme: "default", securityLevel: "loose" });
-      const id = "mermaid-arch-" + Date.now();
-      m.render(id, DIAGRAM).then(({ svg }: { svg: string }) => {
-        if (ref.current) ref.current.innerHTML = svg;
-      }).catch(console.error);
-    }
-  }, []);
-
-  return (
-    <div style={{ padding: "24px", background: "#f8fafc", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
-      <div style={{ background: "#1e3a5f", color: "#fff", padding: "12px 20px", borderRadius: "8px", marginBottom: "20px" }}>
-        <h2 style={{ margin: 0, fontSize: "16px", fontWeight: 600 }}>Diagramme d&apos;architecture de deploiement</h2>
-        <p style={{ margin: "4px 0 0", fontSize: "12px", opacity: 0.8 }}>Infrastructure Replit : proxy, services, base de donnees</p>
-      </div>
-      <div style={{ background: "#fff", borderRadius: "8px", padding: "20px", border: "1px solid #e2e8f0", overflowX: "auto" }}>
-        <pre ref={ref} style={{ margin: 0 }}>Chargement du diagramme...</pre>
-      </div>
-    </div>
-  );
+  return <DiagramPage title="Diagramme de deploiement — Architecture de l'Infrastructure" subtitle="Replit Proxy, Express API, PostgreSQL — flux de donnees" diagram={D} />;
 }
