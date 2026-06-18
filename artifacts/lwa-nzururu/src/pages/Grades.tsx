@@ -61,6 +61,13 @@ export default function Grades() {
     return new Set(myAssignments.filter((a) => a.classId === classIdNum).map((a) => a.subjectId));
   }, [isRestricted, myAssignments, form.classId]);
 
+  const allowedSubjectIdsForFilter = useMemo(() => {
+    if (!isEnseignant) return null;
+    const classIdNum = filterClassId !== "all" ? parseInt(filterClassId) : null;
+    if (!classIdNum) return new Set(myAssignments.map((a) => a.subjectId));
+    return new Set(myAssignments.filter((a) => a.classId === classIdNum).map((a) => a.subjectId));
+  }, [isEnseignant, myAssignments, filterClassId]);
+
   const filteredClasses = useMemo(() => {
     if (!allowedClassIds) return allClasses || [];
     return (allClasses || []).filter((c) => allowedClassIds.has(c.id));
@@ -71,6 +78,12 @@ export default function Grades() {
     if (!allowedSubjectIdsForClass) return [];
     return (allSubjects || []).filter((s) => allowedSubjectIdsForClass.has(s.id));
   }, [allSubjects, isRestricted, allowedSubjectIdsForClass]);
+
+  const filterBarSubjects = useMemo(() => {
+    if (!isEnseignant) return allSubjects || [];
+    if (!allowedSubjectIdsForFilter) return allSubjects || [];
+    return (allSubjects || []).filter((s) => allowedSubjectIdsForFilter.has(s.id));
+  }, [allSubjects, isEnseignant, allowedSubjectIdsForFilter]);
 
   const studentParams = filterClassId !== "all"
     ? { classId: parseInt(filterClassId), academicYear: CURRENT_YEAR }
@@ -269,7 +282,7 @@ export default function Grades() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toutes les matieres</SelectItem>
-            {(!isRestricted ? allSubjects || [] : filteredSubjects).map((s) => (
+            {(isTitulaire ? allSubjects || [] : filterBarSubjects).map((s) => (
               <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
             ))}
           </SelectContent>
