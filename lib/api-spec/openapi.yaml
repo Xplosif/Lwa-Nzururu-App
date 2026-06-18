@@ -1398,6 +1398,8 @@ components:
           type: ["string", "null"]
         fonction:
           type: ["string", "null"]
+        phoneNumber:
+          type: ["string", "null"]
         address:
           type: ["string", "null"]
         confession:
@@ -1473,6 +1475,8 @@ components:
           type: ["string", "null"]
         fonction:
           type: ["string", "null"]
+        phoneNumber:
+          type: ["string", "null"]
         address:
           type: ["string", "null"]
         confession:
@@ -1538,6 +1542,8 @@ components:
           type: ["string", "null"]
         fonction:
           type: ["string", "null"]
+        phoneNumber:
+          type: ["string", "null"]
         address:
           type: ["string", "null"]
         confession:
@@ -1583,6 +1589,8 @@ components:
         motherName:
           type: ["string", "null"]
         fonction:
+          type: ["string", "null"]
+        phoneNumber:
           type: ["string", "null"]
         address:
           type: ["string", "null"]

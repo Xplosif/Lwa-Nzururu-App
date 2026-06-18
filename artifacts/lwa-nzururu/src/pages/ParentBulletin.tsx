@@ -88,7 +88,6 @@ function Chat({ titulaireUserId, titulaireFullName }: { titulaireUserId: number;
 
 export default function ParentBulletin() {
   const [semester, setSemester] = useState<"S1" | "S2">("S1");
-  const [chatOpen, setChatOpen] = useState(false);
   const [proviseurChat, setProviseurChat] = useState(false);
   const [proviseur, setProviseur] = useState<{ id: number; fullName: string } | null>(null);
 
@@ -121,21 +120,6 @@ export default function ParentBulletin() {
           <p className="text-muted-foreground text-sm">Institut Lwa-Nzururu — {CURRENT_YEAR}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {data?.titulaireUserId && (
-            <Dialog open={chatOpen} onOpenChange={setChatOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline" className="gap-1.5">
-                  <MessageCircle size={15} /> Titulaire
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Chat avec {data.titulaireFullName || "le titulaire"}</DialogTitle>
-                </DialogHeader>
-                <Chat titulaireUserId={data.titulaireUserId} titulaireFullName={data.titulaireFullName || "Le titulaire"} />
-              </DialogContent>
-            </Dialog>
-          )}
           {proviseur && (
             <Dialog open={proviseurChat} onOpenChange={setProviseurChat}>
               <DialogTrigger asChild>
@@ -168,7 +152,7 @@ export default function ParentBulletin() {
                   <p>Beni, Nord-Kivu, RDC</p>
                   <p>Bureau du Proviseur — disponible du lundi au vendredi</p>
                 </div>
-                <p className="text-xs text-muted-foreground">Vous pouvez aussi envoyer un message direct au titulaire de la classe via le bouton "Chat avec le titulaire".</p>
+                <p className="text-xs text-muted-foreground">Pour toute communication urgente, utilisez le bouton "Proviseur" pour un message direct.</p>
               </div>
             </DialogContent>
           </Dialog>

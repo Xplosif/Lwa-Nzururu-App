@@ -36,6 +36,7 @@ export default function StudentNew() {
     fatherName: "",
     motherName: "",
     fonction: "",
+    phoneNumber: "",
     address: "",
     confession: "",
     ecoleProvenance: "",
@@ -86,6 +87,7 @@ export default function StudentNew() {
         fatherName: form.fatherName || undefined,
         motherName: form.motherName || undefined,
         fonction: form.fonction || undefined,
+        phoneNumber: form.phoneNumber || undefined,
         address: form.address || undefined,
         confession: form.confession || undefined,
         ecoleProvenance: form.ecoleProvenance || undefined,
@@ -126,7 +128,7 @@ export default function StudentNew() {
             </Button>
             <div className="flex gap-3">
               <Button onClick={() => navigate("/students")} className="flex-1">Terminer</Button>
-              <Button variant="outline" onClick={() => { setParentCreds(null); setForm({ lastName: "", postnom: "", firstName: "", gender: "M", dateOfBirth: "", placeOfBirth: "", fatherName: "", motherName: "", fonction: "", address: "", confession: "", ecoleProvenance: "", bulletinsPresentes: [], pourcentagePrecedent: "", classId: "" }); }} className="flex-1">
+              <Button variant="outline" onClick={() => { setParentCreds(null); setForm({ lastName: "", postnom: "", firstName: "", gender: "M", dateOfBirth: "", placeOfBirth: "", fatherName: "", motherName: "", fonction: "", phoneNumber: "", address: "", confession: "", ecoleProvenance: "", bulletinsPresentes: [], pourcentagePrecedent: "", classId: "" }); }} className="flex-1">
                 Inscrire un autre
               </Button>
             </div>
@@ -198,6 +200,11 @@ export default function StudentNew() {
             <div className="space-y-1">
               <Label>Fonction (profession)</Label>
               <Input value={form.fonction} onChange={(e) => set("fonction", e.target.value)} placeholder="Ex: Commercant, Fonctionnaire..." />
+            </div>
+
+            <div className="space-y-1">
+              <Label>Numero de telephone</Label>
+              <Input value={form.phoneNumber} onChange={(e) => set("phoneNumber", e.target.value)} placeholder="Ex: +243 81 234 5678" type="tel" />
             </div>
 
             <div className="space-y-1">

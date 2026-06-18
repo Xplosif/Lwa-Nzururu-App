@@ -228,6 +228,8 @@ export interface Student {
   /** @nullable */
   fonction?: string | null;
   /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
   address?: string | null;
   /** @nullable */
   confession?: string | null;
@@ -304,6 +306,8 @@ export interface StudentDetail {
   /** @nullable */
   fonction?: string | null;
   /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
   address?: string | null;
   /** @nullable */
   confession?: string | null;
@@ -350,6 +354,8 @@ export interface CreateStudentBody {
   /** @nullable */
   fonction?: string | null;
   /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
   address?: string | null;
   /** @nullable */
   confession?: string | null;
@@ -393,6 +399,8 @@ export interface UpdateStudentBody {
   motherName?: string | null;
   /** @nullable */
   fonction?: string | null;
+  /** @nullable */
+  phoneNumber?: string | null;
   /** @nullable */
   address?: string | null;
   /** @nullable */

@@ -14,6 +14,7 @@ export const studentsTable = pgTable("students", {
   fatherName: text("father_name"),
   motherName: text("mother_name"),
   fonction: text("fonction"),
+  phoneNumber: text("phone_number"),
   address: text("address"),
   confession: text("confession"),
   ecoleProvenance: text("ecole_provenance"),
