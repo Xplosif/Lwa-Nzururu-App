@@ -55,7 +55,7 @@ export default function EnseignantDashboard() {
     <div className="p-4 sm:p-6 space-y-5">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Mon espace — Enseignant</h1>
-        <p className="text-muted-foreground text-sm">Annee academique {CURRENT_YEAR}</p>
+        <p className="text-muted-foreground text-sm">Annee scolaire {CURRENT_YEAR}</p>
       </div>
 
       {myAssignments.length === 0 ? (

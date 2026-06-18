@@ -13,7 +13,7 @@ const router: IRouter = Router();
 
 const SCHOOL_INFO = {
   name: "Institut Lwa-Nzururu",
-  address: "Butembo, Nord-Kivu",
+  address: "Beni, Nord-Kivu",
   province: "Nord-Kivu",
   territoire: "Lubero",
   code: "LWA-001",

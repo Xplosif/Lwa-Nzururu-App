@@ -37,10 +37,10 @@ export default function Archives() {
             <Button size="sm" className="gap-1.5 w-full sm:w-auto"><Plus size={16} /> Archiver une annee</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Archiver une annee academique</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>Archiver une annee scolaire</DialogTitle></DialogHeader>
             <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate({ data: { academicYear: form.academicYear, notes: form.notes || undefined } }); }} className="space-y-4">
               <div className="space-y-1">
-                <Label>Annee academique *</Label>
+                <Label>Annee scolaire *</Label>
                 <Input value={form.academicYear} onChange={(e) => setForm({ ...form, academicYear: e.target.value })} placeholder="Ex: 2024-2025" required />
               </div>
               <div className="space-y-1">
@@ -65,7 +65,7 @@ export default function Archives() {
           <CardContent className="py-12 text-center">
             <Archive size={40} className="mx-auto text-muted-foreground/40 mb-3" />
             <p className="text-muted-foreground">Aucune archive</p>
-            <p className="text-sm text-muted-foreground mt-1">Archivez une annee academique terminee pour conserver ses donnees.</p>
+            <p className="text-sm text-muted-foreground mt-1">Archivez une annee scolaire terminee pour conserver ses donnees.</p>
           </CardContent>
         </Card>
       ) : (

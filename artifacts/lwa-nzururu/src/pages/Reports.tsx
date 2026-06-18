@@ -96,7 +96,7 @@ export default function Reports() {
                     <p className="font-bold text-lg">{bulletin.schoolInfo?.name || "Institut Lwa-Nzururu"}</p>
                     <p className="text-sm text-muted-foreground">{bulletin.schoolInfo?.address}</p>
                     <h2 className="text-xl font-bold mt-2">BULLETIN ANNUEL</h2>
-                    <p className="text-sm">Annee academique: {bulletin.academicYear}</p>
+                    <p className="text-sm">Annee scolaire: {bulletin.academicYear}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -150,7 +150,7 @@ export default function Reports() {
                       <p><strong>Decision:</strong> <span className={`font-bold ${bulletin.passed ? "text-green-600" : "text-red-600"}`}>{bulletin.passed ? "ADMIS(E)" : "ECHOUE(E)"}</span></p>
                     </div>
                     <div className="text-right mt-4">
-                      <p className="text-xs text-muted-foreground">{bulletin.signature?.location || "Butembo"}, le _______________</p>
+                      <p className="text-xs text-muted-foreground">{bulletin.signature?.location || "Beni"}, le _______________</p>
                       <p className="font-bold mt-4">{bulletin.signature?.provisioneurName}</p>
                       <p className="text-xs">{bulletin.signature?.title}</p>
                     </div>
@@ -200,7 +200,7 @@ export default function Reports() {
                   </tbody>
                 </table>
                 <div className="text-right mt-4 text-sm">
-                  <p className="text-muted-foreground">{palmares.signature?.location || "Butembo"}, le _______________</p>
+                  <p className="text-muted-foreground">{palmares.signature?.location || "Beni"}, le _______________</p>
                   <p className="font-bold mt-8">{palmares.signature?.provisioneurName}</p>
                   <p className="text-xs">{palmares.signature?.title}</p>
                 </div>

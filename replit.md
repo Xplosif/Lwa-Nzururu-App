@@ -53,7 +53,7 @@ pnpm workspace monorepo using TypeScript. **Institut Lwa-Nzururu** — a French-
 - Academic year default: 2024-2025
 - All UI and error messages in French
 - No emojis in UI
-- School info: Institut Lwa-Nzururu, Butembo, Nord-Kivu, RDC
+- School info: Institut Lwa-Nzururu, Beni, Nord-Kivu, RDC
 - Vite proxy: `/api` → `http://localhost:8080`
 
 ## DB Schema (lib/db/src/schema/)

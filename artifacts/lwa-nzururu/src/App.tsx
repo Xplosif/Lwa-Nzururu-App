@@ -74,6 +74,10 @@ function AppRoutes() {
     );
   }
 
+  if (user.isFirstLogin) {
+    return <SetupAccount />;
+  }
+
   return (
     <Layout>
       <Switch>

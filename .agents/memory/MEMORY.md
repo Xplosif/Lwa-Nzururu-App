@@ -1,0 +1,1 @@
+- [First-login forced setup](first-login-flow.md) — isFirstLogin guard in App.tsx must render SetupAccount directly; /setup-account in unauth section is unreachable when user state is set.

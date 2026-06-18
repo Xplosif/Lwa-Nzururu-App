@@ -268,7 +268,7 @@ export default function StudentNew() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>Annee academique</Label>
+              <Label>Annee scolaire</Label>
               <Input value={CURRENT_YEAR} disabled className="bg-muted" />
             </div>
           </CardContent>

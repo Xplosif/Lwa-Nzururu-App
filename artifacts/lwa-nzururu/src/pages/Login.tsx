@@ -50,7 +50,7 @@ export default function Login() {
             <span className="text-primary-foreground font-bold text-2xl">L</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground">Institut Lwa-Nzururu</h1>
-          <p className="text-muted-foreground text-sm mt-1">Butembo, Nord-Kivu, RDC</p>
+          <p className="text-muted-foreground text-sm mt-1">Beni, Nord-Kivu, RDC</p>
         </div>
 
         <Card>

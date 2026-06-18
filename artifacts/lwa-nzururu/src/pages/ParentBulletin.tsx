@@ -89,6 +89,15 @@ function Chat({ titulaireUserId, titulaireFullName }: { titulaireUserId: number;
 export default function ParentBulletin() {
   const [semester, setSemester] = useState<"S1" | "S2">("S1");
   const [chatOpen, setChatOpen] = useState(false);
+  const [proviseurChat, setProviseurChat] = useState(false);
+  const [proviseur, setProviseur] = useState<{ id: number; fullName: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/proviseur", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d) setProviseur(d); })
+      .catch(() => {});
+  }, []);
 
   const semesterPeriods = semester === "S1" ? ["P1", "P2", "exam_s1"] : ["P3", "P4", "exam_s2"];
 
@@ -116,7 +125,7 @@ export default function ParentBulletin() {
             <Dialog open={chatOpen} onOpenChange={setChatOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" variant="outline" className="gap-1.5">
-                  <MessageCircle size={15} /> Chat avec le titulaire
+                  <MessageCircle size={15} /> Titulaire
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
@@ -124,6 +133,21 @@ export default function ParentBulletin() {
                   <DialogTitle>Chat avec {data.titulaireFullName || "le titulaire"}</DialogTitle>
                 </DialogHeader>
                 <Chat titulaireUserId={data.titulaireUserId} titulaireFullName={data.titulaireFullName || "Le titulaire"} />
+              </DialogContent>
+            </Dialog>
+          )}
+          {proviseur && (
+            <Dialog open={proviseurChat} onOpenChange={setProviseurChat}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="gap-1.5">
+                  <MessageCircle size={15} /> Proviseur
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Chat avec {proviseur.fullName} (Proviseur)</DialogTitle>
+                </DialogHeader>
+                <Chat titulaireUserId={proviseur.id} titulaireFullName={proviseur.fullName} />
               </DialogContent>
             </Dialog>
           )}
@@ -141,7 +165,7 @@ export default function ParentBulletin() {
                 <p className="text-muted-foreground">Pour toute question administrative, contactez le bureau d'etudes de l'Institut Lwa-Nzururu :</p>
                 <div className="space-y-2 bg-muted/40 rounded-md p-3">
                   <p><strong>Institut Lwa-Nzururu</strong></p>
-                  <p>Butembo, Nord-Kivu, RDC</p>
+                  <p>Beni, Nord-Kivu, RDC</p>
                   <p>Bureau du Proviseur — disponible du lundi au vendredi</p>
                 </div>
                 <p className="text-xs text-muted-foreground">Vous pouvez aussi envoyer un message direct au titulaire de la classe via le bouton "Chat avec le titulaire".</p>
@@ -209,9 +233,9 @@ export default function ParentBulletin() {
           <CardHeader className="pb-3">
             <div className="text-center space-y-1">
               <p className="font-bold text-lg">Institut Lwa-Nzururu</p>
-              <p className="text-sm text-muted-foreground">Butembo, Nord-Kivu, RDC</p>
+              <p className="text-sm text-muted-foreground">Beni, Nord-Kivu, RDC</p>
               <p className="font-semibold mt-2">BULLETIN DE RESULTATS — {data.semester === "S1" ? "1ER SEMESTRE" : "2E SEMESTRE"}</p>
-              <p className="text-sm">Annee academique : {data.academicYear}</p>
+              <p className="text-sm">Annee scolaire : {data.academicYear}</p>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">

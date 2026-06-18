@@ -68,7 +68,7 @@ export default function Settings() {
               </div>
               <div className="space-y-1">
                 <Label>Lieu</Label>
-                <Input value={sigForm.location} onChange={(e) => setSigForm({ ...sigForm, location: e.target.value })} placeholder="Butembo" />
+                <Input value={sigForm.location} onChange={(e) => setSigForm({ ...sigForm, location: e.target.value })} placeholder="Beni" />
               </div>
             </div>
             <div className="space-y-1">

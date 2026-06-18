@@ -95,7 +95,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </button>
         <div className="flex flex-col items-center min-w-0 px-2">
           <span className="font-bold text-sidebar-primary text-sm truncate">Institut Lwa-Nzururu</span>
-          <span className="text-sidebar-foreground/60 text-[10px] truncate">{currentNav?.label || "Butembo, Nord-Kivu"}</span>
+          <span className="text-sidebar-foreground/60 text-[10px] truncate">{currentNav?.label || "Beni, Nord-Kivu"}</span>
         </div>
         <div className="flex items-center gap-1">
           {unreadCount > 0 && (
@@ -138,7 +138,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {(desktopOpen || mobileOpen) && (
             <div className="flex flex-col min-w-0">
               <span className="font-bold text-sidebar-primary text-sm truncate">Institut Lwa-Nzururu</span>
-              <span className="text-sidebar-foreground/60 text-xs truncate">Butembo, Nord-Kivu</span>
+              <span className="text-sidebar-foreground/60 text-xs truncate">Beni, Nord-Kivu</span>
             </div>
           )}
           <button

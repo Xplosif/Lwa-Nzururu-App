@@ -71,7 +71,7 @@ export default function Dashboard() {
     <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-foreground">Tableau de bord</h1>
-        <p className="text-muted-foreground text-sm">Annee academique {year}</p>
+        <p className="text-muted-foreground text-sm">Annee scolaire {year}</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

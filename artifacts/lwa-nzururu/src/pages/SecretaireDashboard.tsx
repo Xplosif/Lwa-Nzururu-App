@@ -26,7 +26,7 @@ export default function SecretaireDashboard() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold">Tableau de bord — Secretaire</h1>
-          <p className="text-muted-foreground text-sm">Annee academique {CURRENT_YEAR}</p>
+          <p className="text-muted-foreground text-sm">Annee scolaire {CURRENT_YEAR}</p>
         </div>
         <Link href="/students/new">
           <Button size="sm" className="gap-1.5">

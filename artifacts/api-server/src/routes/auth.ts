@@ -196,23 +196,39 @@ router.put("/auth/profile", async (req, res): Promise<void> => {
   const userId = (req as any).session?.userId;
   if (!userId) { res.status(401).json({ error: "Non authentifie" }); return; }
 
-  const { fullName, currentPassword, newPassword } = req.body;
+  const { fullName, currentPassword, newPassword, newUsername } = req.body;
   const updates: Partial<typeof usersTable.$inferInsert> = {};
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
+  if (!user) { res.status(401).json({ error: "Utilisateur introuvable" }); return; }
 
   if (typeof fullName === "string" && fullName.trim()) {
     updates.fullName = fullName.trim();
   }
 
+  if (typeof newUsername === "string" && newUsername.trim() && newUsername !== user.username) {
+    const existing = await db.select().from(usersTable).where(eq(usersTable.username, newUsername.trim()));
+    if (existing.length > 0 && existing[0].id !== userId) {
+      res.status(400).json({ error: "Cet identifiant est deja pris" }); return;
+    }
+    updates.username = newUsername.trim();
+  }
+
   if (newPassword) {
-    if (!currentPassword) { res.status(400).json({ error: "Mot de passe actuel requis" }); return; }
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
-    if (!user || !verifyPassword(currentPassword, user.passwordHash)) {
-      res.status(400).json({ error: "Mot de passe actuel incorrect" }); return;
+    if (!user.isFirstLogin) {
+      if (!currentPassword) { res.status(400).json({ error: "Mot de passe actuel requis" }); return; }
+      if (!verifyPassword(currentPassword, user.passwordHash)) {
+        res.status(400).json({ error: "Mot de passe actuel incorrect" }); return;
+      }
     }
     if (typeof newPassword !== "string" || newPassword.length < 6) {
       res.status(400).json({ error: "Le nouveau mot de passe doit faire au moins 6 caracteres" }); return;
     }
     updates.passwordHash = hashPassword(newPassword);
+  }
+
+  if (user.isFirstLogin && (updates.username || updates.passwordHash)) {
+    updates.isFirstLogin = false;
+    updates.tempUsername = null;
   }
 
   if (Object.keys(updates).length === 0) { res.status(400).json({ error: "Aucune donnee a mettre a jour" }); return; }
@@ -238,6 +254,16 @@ router.put("/auth/profile", async (req, res): Promise<void> => {
   }
 
   res.json(userObj);
+});
+
+router.get("/auth/proviseur", async (req, res): Promise<void> => {
+  if (!(req as any).session?.userId) { res.status(401).json({ error: "Non authentifie" }); return; }
+  const [proviseur] = await db.select({ id: usersTable.id, fullName: usersTable.fullName })
+    .from(usersTable)
+    .where(eq(usersTable.role, "proviseur"))
+    .limit(1);
+  if (!proviseur) { res.status(404).json({ error: "Aucun proviseur" }); return; }
+  res.json(proviseur);
 });
 
 router.post("/auth/change-password", async (req, res): Promise<void> => {

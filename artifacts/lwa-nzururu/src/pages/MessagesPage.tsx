@@ -1,31 +1,29 @@
 import { useState, useRef, useEffect } from "react";
-import {
-  useListMessages, getListMessagesQueryKey, useSendMessage,
-  useListStudents, getListStudentsQueryKey,
-} from "@workspace/api-client-react";
+import { useListMessages, getListMessagesQueryKey, useSendMessage } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, ArrowLeft } from "lucide-react";
 
-const CURRENT_YEAR = "2024-2025";
-
-interface ParentContact {
+interface Conversation {
   userId: number;
   fullName: string;
-  studentName: string;
+  role: string;
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
 }
 
-function Conversation({ withUser, onBack }: { withUser: ParentContact; onBack: () => void }) {
+function ConversationView({ partner, onBack }: { partner: Conversation; onBack: () => void }) {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const { data: messages, refetch } = useListMessages(
-    { withUserId: withUser.userId },
-    { query: { queryKey: getListMessagesQueryKey({ withUserId: withUser.userId }), refetchInterval: 5000 } }
+    { withUserId: partner.userId },
+    { query: { queryKey: getListMessagesQueryKey({ withUserId: partner.userId }), refetchInterval: 5000 } }
   );
 
   const sendMutation = useSendMessage({
@@ -38,11 +36,13 @@ function Conversation({ withUser, onBack }: { withUser: ParentContact; onBack: (
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-3 p-4 border-b">
-        <Button size="sm" variant="ghost" onClick={onBack}>&larr; Retour</Button>
+      <div className="flex items-center gap-3 p-4 border-b flex-shrink-0">
+        <Button size="sm" variant="ghost" className="gap-1" onClick={onBack}>
+          <ArrowLeft size={16} /> Retour
+        </Button>
         <div>
-          <p className="font-medium">{withUser.fullName}</p>
-          <p className="text-xs text-muted-foreground">Parent de : {withUser.studentName}</p>
+          <p className="font-medium">{partner.fullName}</p>
+          <p className="text-xs text-muted-foreground capitalize">{partner.role === "parent" ? "Parent d'eleve" : partner.role}</p>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-muted/10">
@@ -64,8 +64,8 @@ function Conversation({ withUser, onBack }: { withUser: ParentContact; onBack: (
         <div ref={bottomRef} />
       </div>
       <form
-        onSubmit={(e) => { e.preventDefault(); if (message.trim()) sendMutation.mutate({ data: { toUserId: withUser.userId, content: message } }); }}
-        className="flex gap-2 p-4 border-t"
+        onSubmit={(e) => { e.preventDefault(); if (message.trim()) sendMutation.mutate({ data: { toUserId: partner.userId, content: message } }); }}
+        className="flex gap-2 p-4 border-t flex-shrink-0"
       >
         <Input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Ecrire un message..." className="flex-1" />
         <Button type="submit" disabled={!message.trim() || sendMutation.isPending}>
@@ -78,25 +78,28 @@ function Conversation({ withUser, onBack }: { withUser: ParentContact; onBack: (
 
 export default function MessagesPage() {
   const { user } = useAuth();
-  const [selected, setSelected] = useState<ParentContact | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loadingConvs, setLoadingConvs] = useState(true);
+  const [selected, setSelected] = useState<Conversation | null>(null);
 
-  const classStudentParams = { classId: user?.classId || 0, academicYear: CURRENT_YEAR };
-  const { data: students } = useListStudents(classStudentParams, {
-    query: { enabled: !!user?.classId, queryKey: getListStudentsQueryKey(classStudentParams) },
-  });
+  const fetchConversations = async () => {
+    try {
+      const res = await fetch("/api/messages/conversations", { credentials: "include" });
+      if (res.ok) setConversations(await res.json());
+    } catch { /* ignore */ }
+    finally { setLoadingConvs(false); }
+  };
 
-  const parentContacts: ParentContact[] = (students || [])
-    .filter((s) => s.parentUserId)
-    .map((s) => ({
-      userId: s.parentUserId!,
-      fullName: s.parentFullName || `Parent de ${s.firstName}`,
-      studentName: `${s.firstName} ${s.lastName}`,
-    }));
+  useEffect(() => {
+    fetchConversations();
+    const id = setInterval(fetchConversations, 10000);
+    return () => clearInterval(id);
+  }, []);
 
   if (selected) {
     return (
       <div className="h-full flex flex-col">
-        <Conversation withUser={selected} onBack={() => setSelected(null)} />
+        <ConversationView partner={selected} onBack={() => { setSelected(null); fetchConversations(); }} />
       </div>
     );
   }
@@ -106,32 +109,45 @@ export default function MessagesPage() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Messages</h1>
         <p className="text-muted-foreground text-sm">
-          {user?.role === "titulaire" ? `Parents de votre classe : ${user?.className}` : "Vos conversations"}
+          {user?.role === "titulaire" ? `Conversations avec les parents de votre classe` : "Vos conversations"}
         </p>
       </div>
 
-      {user?.role === "titulaire" && parentContacts.length === 0 && (
+      {loadingConvs && <p className="text-muted-foreground text-sm">Chargement...</p>}
+
+      {!loadingConvs && conversations.length === 0 && (
         <Card>
           <CardContent className="pt-6">
             <p className="text-muted-foreground text-sm">
-              Aucun parent n'est encore enregistre pour votre classe. Les comptes parents sont crees lors de l'inscription des eleves.
+              Aucune conversation pour l'instant. Les parents peuvent vous envoyer un message depuis leur bulletin.
             </p>
           </CardContent>
         </Card>
       )}
 
       <div className="space-y-2">
-        {parentContacts.map((contact) => (
-          <Card key={contact.userId} className="cursor-pointer hover:border-primary/40 transition-colors" onClick={() => setSelected(contact)}>
+        {conversations.map((conv) => (
+          <Card
+            key={conv.userId}
+            className="cursor-pointer hover:border-primary/40 transition-colors"
+            onClick={() => setSelected(conv)}
+          >
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 rounded-full bg-muted">
+              <div className="p-2 rounded-full bg-muted flex-shrink-0">
                 <MessageCircle size={18} className="text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium">{contact.fullName}</p>
-                <p className="text-xs text-muted-foreground">Parent de : {contact.studentName}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{conv.fullName}</p>
+                  {conv.unreadCount > 0 && (
+                    <Badge variant="destructive" className="text-xs px-1.5 py-0">{conv.unreadCount}</Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
               </div>
-              <Button size="sm" variant="outline">Ouvrir</Button>
+              <p className="text-xs text-muted-foreground flex-shrink-0">
+                {conv.lastMessageAt ? new Date(conv.lastMessageAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) : ""}
+              </p>
             </CardContent>
           </Card>
         ))}
