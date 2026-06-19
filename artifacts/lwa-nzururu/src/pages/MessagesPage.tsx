@@ -42,7 +42,9 @@ function ConversationView({ partner, onBack }: { partner: Conversation; onBack: 
         </Button>
         <div>
           <p className="font-medium">{partner.fullName}</p>
-          <p className="text-xs text-muted-foreground capitalize">{partner.role === "parent" ? "Parent d'eleve" : partner.role}</p>
+          <p className="text-xs text-muted-foreground capitalize">
+            {partner.role === "parent" ? "Parent d'eleve" : partner.role === "titulaire" ? "Titulaire de classe" : partner.role}
+          </p>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-muted/10">
@@ -76,6 +78,42 @@ function ConversationView({ partner, onBack }: { partner: Conversation; onBack: 
   );
 }
 
+const STAFF_ROLES = ["proviseur", "titulaire", "enseignant", "secretaire"];
+
+function ConversationGroup({ title, convs, onSelect }: { title: string; convs: Conversation[]; onSelect: (c: Conversation) => void }) {
+  if (convs.length === 0) return null;
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">{title}</p>
+      {convs.map((conv) => (
+        <Card
+          key={conv.userId}
+          className="cursor-pointer hover:border-primary/40 transition-colors"
+          onClick={() => onSelect(conv)}
+        >
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="p-2 rounded-full bg-muted flex-shrink-0">
+              <MessageCircle size={18} className="text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-medium">{conv.fullName}</p>
+                {conv.unreadCount > 0 && (
+                  <Badge variant="destructive" className="text-xs px-1.5 py-0">{conv.unreadCount}</Badge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
+            </div>
+            <p className="text-xs text-muted-foreground flex-shrink-0">
+              {conv.lastMessageAt ? new Date(conv.lastMessageAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) : ""}
+            </p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 export default function MessagesPage() {
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -104,12 +142,15 @@ export default function MessagesPage() {
     );
   }
 
+  const staffConvs = conversations.filter((c) => STAFF_ROLES.includes(c.role));
+  const parentConvs = conversations.filter((c) => c.role === "parent");
+
   return (
-    <div className="p-4 sm:p-6 space-y-4">
+    <div className="p-4 sm:p-6 space-y-5">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Messages</h1>
         <p className="text-muted-foreground text-sm">
-          {user?.role === "titulaire" ? `Conversations avec les parents de votre classe` : "Vos conversations"}
+          {user?.role === "parent" ? "Vos conversations avec l'etablissement" : "Vos conversations"}
         </p>
       </div>
 
@@ -119,39 +160,21 @@ export default function MessagesPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-muted-foreground text-sm">
-              Aucune conversation pour l'instant. Les parents peuvent vous envoyer un message depuis leur bulletin.
+              Aucune conversation pour l'instant.{" "}
+              {user?.role === "parent"
+                ? "Envoyez un message depuis le bulletin de votre enfant."
+                : "Les parents peuvent vous envoyer un message depuis le bulletin."}
             </p>
           </CardContent>
         </Card>
       )}
 
-      <div className="space-y-2">
-        {conversations.map((conv) => (
-          <Card
-            key={conv.userId}
-            className="cursor-pointer hover:border-primary/40 transition-colors"
-            onClick={() => setSelected(conv)}
-          >
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 rounded-full bg-muted flex-shrink-0">
-                <MessageCircle size={18} className="text-muted-foreground" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium">{conv.fullName}</p>
-                  {conv.unreadCount > 0 && (
-                    <Badge variant="destructive" className="text-xs px-1.5 py-0">{conv.unreadCount}</Badge>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.lastMessage}</p>
-              </div>
-              <p className="text-xs text-muted-foreground flex-shrink-0">
-                {conv.lastMessageAt ? new Date(conv.lastMessageAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) : ""}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {!loadingConvs && conversations.length > 0 && (
+        <div className="space-y-5">
+          <ConversationGroup title="Parents d'eleves" convs={parentConvs} onSelect={setSelected} />
+          <ConversationGroup title="Personnel scolaire" convs={staffConvs} onSelect={setSelected} />
+        </div>
+      )}
     </div>
   );
 }

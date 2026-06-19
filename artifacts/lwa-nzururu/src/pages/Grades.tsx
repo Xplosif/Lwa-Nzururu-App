@@ -27,10 +27,12 @@ export default function Grades() {
   const { user } = useAuth();
   const isEnseignant = user?.role === "enseignant";
   const isTitulaire = user?.role === "titulaire";
-  const isRestricted = isEnseignant || isTitulaire;
+  // Titulaire is also an enseignant: same restrictions for grade entry
+  const isTeacher = isEnseignant || isTitulaire;
+  const isRestricted = isTeacher;
 
   const [filterClassId, setFilterClassId] = useState<string>(() => {
-    if ((isEnseignant || isTitulaire) && user?.classId) return String(user.classId);
+    if (isTitulaire && user?.classId) return String(user.classId);
     return "all";
   });
   const [filterSubjectId, setFilterSubjectId] = useState<string>("all");
@@ -43,17 +45,19 @@ export default function Grades() {
   const { data: allClasses } = useListClasses();
   const { data: allSubjects } = useListSubjects();
 
+  // My course assignments (enseignant or titulaire)
   const myAssignments = useMemo(
     () => (allAssignments || []).filter((a) => a.teacherId === user?.id),
     [allAssignments, user?.id]
   );
 
+  // Classes I can enter grades for (based on assignments)
   const allowedClassIds = useMemo(() => {
     if (!isRestricted) return null;
-    if (isTitulaire && user?.classId) return new Set([user.classId]);
     return new Set(myAssignments.map((a) => a.classId));
-  }, [isRestricted, isTitulaire, myAssignments, user?.classId]);
+  }, [isRestricted, myAssignments]);
 
+  // Subjects I can enter grades for in a given class (dialog form)
   const allowedSubjectIdsForClass = useMemo(() => {
     if (!isRestricted) return null;
     const classIdNum = form.classId ? parseInt(form.classId) : null;
@@ -61,6 +65,7 @@ export default function Grades() {
     return new Set(myAssignments.filter((a) => a.classId === classIdNum).map((a) => a.subjectId));
   }, [isRestricted, myAssignments, form.classId]);
 
+  // Subjects visible in the filter bar (based on filterClassId)
   const allowedSubjectIdsForFilter = useMemo(() => {
     if (!isEnseignant) return null;
     const classIdNum = filterClassId !== "all" ? parseInt(filterClassId) : null;
@@ -73,12 +78,14 @@ export default function Grades() {
     return (allClasses || []).filter((c) => allowedClassIds.has(c.id));
   }, [allClasses, allowedClassIds]);
 
+  // Subjects in the dialog form (restricted to assigned subjects for the chosen class)
   const filteredSubjects = useMemo(() => {
     if (!isRestricted) return allSubjects || [];
     if (!allowedSubjectIdsForClass) return [];
     return (allSubjects || []).filter((s) => allowedSubjectIdsForClass.has(s.id));
   }, [allSubjects, isRestricted, allowedSubjectIdsForClass]);
 
+  // Subjects in the filter bar
   const filterBarSubjects = useMemo(() => {
     if (!isEnseignant) return allSubjects || [];
     if (!allowedSubjectIdsForFilter) return allSubjects || [];
@@ -93,12 +100,13 @@ export default function Grades() {
   });
 
   const gradeQuery: Record<string, string | number> = { academicYear: CURRENT_YEAR };
-  if (isEnseignant && filterClassId === "all" && allowedClassIds && allowedClassIds.size > 0) {
+  if (isTitulaire && user?.classId) {
+    // Titulaire always sees their whole class
+    gradeQuery.classId = user.classId;
+  } else if (isEnseignant && filterClassId === "all" && allowedClassIds && allowedClassIds.size > 0) {
     gradeQuery.classId = [...allowedClassIds][0];
   } else if (filterClassId !== "all") {
     gradeQuery.classId = parseInt(filterClassId);
-  } else if (isTitulaire && user?.classId) {
-    gradeQuery.classId = user.classId;
   }
   if (filterSubjectId !== "all") gradeQuery.subjectId = parseInt(filterSubjectId);
 
@@ -109,10 +117,12 @@ export default function Grades() {
   const displayGrades = useMemo(() => {
     let list = grades || [];
     if (isEnseignant) {
+      // Enseignant: only sees grades for their assigned courses
       const mySubjectIds = new Set(myAssignments.map((a) => a.subjectId));
       const myClassIds = allowedClassIds || new Set<number>();
       list = list.filter((g) => mySubjectIds.has(g.subjectId) && myClassIds.has(g.classId));
     } else if (isTitulaire && user?.classId) {
+      // Titulaire: sees ALL grades in their class (for oversight/deliberation)
       list = list.filter((g) => g.classId === user.classId);
     }
     return list;
@@ -134,19 +144,22 @@ export default function Grades() {
 
   const canDelete = (grade: { subjectId: number; classId: number }) => {
     if (!isRestricted) return true;
-    if (isEnseignant) {
-      const mySubjectIds = new Set(myAssignments.map((a) => a.subjectId));
-      return mySubjectIds.has(grade.subjectId);
-    }
-    if (isTitulaire) return true;
-    return false;
+    // Both enseignant and titulaire can only delete grades for their assigned courses
+    const mySubjectIds = new Set(myAssignments.map((a) => a.subjectId));
+    const myClassIds = new Set(myAssignments.map((a) => a.classId));
+    return mySubjectIds.has(grade.subjectId) && myClassIds.has(grade.classId);
   };
 
-  const availablePeriods = isEnseignant ? PERIODS : PERIODS_ALL;
+  // Bonus period only for proviseur/secretaire — enseignant and titulaire cannot enter bonus
+  const availablePeriods = isTeacher ? PERIODS : PERIODS_ALL;
 
   const handleDialogOpen = (val: boolean) => {
-    if (val && isRestricted && filteredClasses.length === 1) {
-      setForm((f) => ({ ...f, classId: String(filteredClasses[0].id) }));
+    if (val) {
+      if (isTitulaire && user?.classId) {
+        setForm((f) => ({ ...f, classId: String(user.classId) }));
+      } else if (isEnseignant && filteredClasses.length === 1) {
+        setForm((f) => ({ ...f, classId: String(filteredClasses[0].id) }));
+      }
     }
     setOpen(val);
   };
@@ -205,7 +218,7 @@ export default function Grades() {
                 <Select
                   value={form.subjectId}
                   onValueChange={(v) => setForm({ ...form, subjectId: v })}
-                  disabled={isEnseignant && !form.classId}
+                  disabled={isTeacher && !form.classId}
                 >
                   <SelectTrigger><SelectValue placeholder="Choisir matiere" /></SelectTrigger>
                   <SelectContent>
@@ -291,12 +304,12 @@ export default function Grades() {
 
       {isEnseignant && (
         <div className="text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
-          Vous voyez uniquement les notes des matieres qui vous sont assignees. Pour saisir des notes, selectionnez d'abord la classe puis la matiere.
+          Vous voyez et saisissez uniquement les notes des cours qui vous sont assignes.
         </div>
       )}
       {isTitulaire && (
         <div className="text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
-          Vous voyez toutes les notes de votre classe ({user?.className}). Vous pouvez saisir des notes pour vos propres matieres uniquement.
+          Vous voyez toutes les notes de votre classe ({user?.className}). Vous pouvez saisir des notes uniquement pour vos cours assignes.
         </div>
       )}
 

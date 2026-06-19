@@ -20,22 +20,37 @@ import {
   UserCog,
 } from "lucide-react";
 
-const navItems = [
-  { href: "/", label: "Tableau de bord", icon: LayoutDashboard, roles: ["proviseur", "titulaire", "enseignant", "secretaire"] },
-  { href: "/students", label: "Eleves", icon: GraduationCap, roles: ["proviseur", "titulaire", "secretaire"] },
-  { href: "/teachers", label: "Personnel", icon: Users, roles: ["proviseur"] },
-  { href: "/classes", label: "Classes", icon: BookOpen, roles: ["proviseur", "titulaire"] },
-  { href: "/subjects", label: "Matieres", icon: BookOpen, roles: ["proviseur"] },
-  { href: "/grades", label: "Notes", icon: ClipboardList, roles: ["proviseur", "enseignant", "titulaire"] },
-  { href: "/proclamation", label: "Proclamation", icon: FileText, roles: ["titulaire"] },
-  { href: "/deliberation", label: "Deliberation", icon: ClipboardList, roles: ["proviseur"] },
-  { href: "/bulletin", label: "Bulletin de mon enfant", icon: GraduationCap, roles: ["parent"] },
-  { href: "/messages", label: "Messages", icon: MessageCircle, roles: ["proviseur", "titulaire", "enseignant", "parent"], badge: true },
-  { href: "/archives", label: "Archives", icon: Archive, roles: ["proviseur"] },
-  { href: "/reports", label: "Rapports PDF", icon: FileText, roles: ["proviseur", "titulaire"] },
-  { href: "/settings", label: "Parametres ecole", icon: Settings, roles: ["proviseur"] },
-  { href: "/profile", label: "Mon profil", icon: UserCog, roles: ["proviseur", "enseignant", "titulaire", "secretaire", "parent"] },
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  roles: string[];
+  badge?: boolean;
+  section: "scolaire" | "communication" | "compte";
+}
+
+const navItems: NavItem[] = [
+  { href: "/", label: "Tableau de bord", icon: LayoutDashboard, roles: ["proviseur", "titulaire", "enseignant", "secretaire"], section: "scolaire" },
+  { href: "/students", label: "Eleves", icon: GraduationCap, roles: ["proviseur", "titulaire", "secretaire"], section: "scolaire" },
+  { href: "/teachers", label: "Personnel", icon: Users, roles: ["proviseur"], section: "scolaire" },
+  { href: "/classes", label: "Classes", icon: BookOpen, roles: ["proviseur", "titulaire"], section: "scolaire" },
+  { href: "/subjects", label: "Matieres", icon: BookOpen, roles: ["proviseur"], section: "scolaire" },
+  { href: "/grades", label: "Notes", icon: ClipboardList, roles: ["proviseur", "enseignant", "titulaire"], section: "scolaire" },
+  { href: "/proclamation", label: "Proclamation", icon: FileText, roles: ["titulaire"], section: "scolaire" },
+  { href: "/deliberation", label: "Deliberation", icon: ClipboardList, roles: ["proviseur"], section: "scolaire" },
+  { href: "/archives", label: "Archives", icon: Archive, roles: ["proviseur"], section: "scolaire" },
+  { href: "/reports", label: "Rapports PDF", icon: FileText, roles: ["proviseur", "titulaire"], section: "scolaire" },
+  { href: "/bulletin", label: "Bulletin de mon enfant", icon: GraduationCap, roles: ["parent"], section: "scolaire" },
+  { href: "/messages", label: "Messages", icon: MessageCircle, roles: ["proviseur", "enseignant", "parent"], badge: true, section: "communication" },
+  { href: "/settings", label: "Parametres ecole", icon: Settings, roles: ["proviseur"], section: "compte" },
+  { href: "/profile", label: "Mon profil", icon: UserCog, roles: ["proviseur", "enseignant", "titulaire", "secretaire", "parent"], section: "compte" },
 ];
+
+const sectionLabels: Record<string, string> = {
+  scolaire: "Gestion scolaire",
+  communication: "Communication",
+  compte: "Mon compte",
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, setUser } = useAuth();
@@ -81,6 +96,46 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const currentNav = filteredNav.find(
     (item) => location === item.href || (item.href !== "/" && location.startsWith(item.href))
   );
+
+  // Group nav items by section (for mobile hamburger)
+  const navBySections = (["scolaire", "communication", "compte"] as const).map((section) => ({
+    section,
+    label: sectionLabels[section],
+    items: filteredNav.filter((item) => item.section === section),
+  })).filter((g) => g.items.length > 0);
+
+  const renderNavItem = (item: NavItem) => {
+    const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
+    const showLabel = desktopOpen || mobileOpen;
+    const showBadge = item.badge && unreadCount > 0;
+    return (
+      <Link key={item.href} href={item.href}>
+        <div
+          className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${
+            isActive
+              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+              : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          }`}
+        >
+          <div className="relative flex-shrink-0">
+            <item.icon size={18} />
+            {showBadge && !showLabel && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-white text-[9px] rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </div>
+          {showLabel && <span className="flex-1 truncate">{item.label}</span>}
+          {showLabel && showBadge && (
+            <span className="ml-auto bg-destructive text-white text-xs rounded-full min-w-[18px] h-4.5 flex items-center justify-center px-1">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+          {showLabel && isActive && !showBadge && <ChevronRight size={14} className="ml-auto flex-shrink-0" />}
+        </div>
+      </Link>
+    );
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-background overflow-hidden">
@@ -153,39 +208,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1">
-          {filteredNav.map((item) => {
-            const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
-            const showLabel = desktopOpen || mobileOpen;
-            const showBadge = item.badge && unreadCount > 0;
-            return (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors ${
-                    isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  }`}
-                >
-                  <div className="relative flex-shrink-0">
-                    <item.icon size={18} />
-                    {showBadge && !showLabel && (
-                      <span className="absolute -top-1 -right-1 bg-destructive text-white text-[9px] rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
-                    )}
+        <nav className="flex-1 overflow-y-auto py-3 px-2">
+          {mobileOpen ? (
+            /* Mobile: grouped by section with labels */
+            <div className="space-y-4">
+              {navBySections.map(({ section, label, items }) => (
+                <div key={section}>
+                  <div className="px-3 pb-1 text-[10px] font-semibold text-sidebar-foreground/40 uppercase tracking-widest">
+                    {label}
                   </div>
-                  {showLabel && <span className="flex-1 truncate">{item.label}</span>}
-                  {showLabel && showBadge && (
-                    <span className="ml-auto bg-destructive text-white text-xs rounded-full min-w-[18px] h-4.5 flex items-center justify-center px-1">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                  {showLabel && isActive && !showBadge && <ChevronRight size={14} className="ml-auto flex-shrink-0" />}
+                  <div className="space-y-0.5">
+                    {items.map(renderNavItem)}
+                  </div>
                 </div>
-              </Link>
-            );
-          })}
+              ))}
+            </div>
+          ) : (
+            /* Desktop: flat list */
+            <div className="space-y-1">
+              {filteredNav.map(renderNavItem)}
+            </div>
+          )}
         </nav>
 
         <div className="border-t border-sidebar-border p-3">

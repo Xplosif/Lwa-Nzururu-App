@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable, classesTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { hashPassword, generateRandomCredentials } from "../lib/auth";
 import {
   CreateUserBody,
@@ -42,6 +42,18 @@ router.post("/users", async (req, res): Promise<void> => {
   }
 
   const { fullName, role, classId } = parsed.data;
+
+  if (role === "titulaire" && classId) {
+    const existing = await db
+      .select()
+      .from(usersTable)
+      .where(and(eq(usersTable.role, "titulaire"), eq(usersTable.classId, classId)));
+    if (existing.length > 0) {
+      res.status(409).json({ error: `Cette classe a deja un titulaire : ${existing[0].fullName}. Une classe ne peut avoir qu'un seul titulaire.` });
+      return;
+    }
+  }
+
   const { username, password } = generateRandomCredentials();
   const passwordHash = hashPassword(password);
 
